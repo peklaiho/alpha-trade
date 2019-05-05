@@ -2,7 +2,7 @@
 {
     public enum Side
     {
-        BID,
-        ASK
+        BUY,
+        SELL
     }
 }

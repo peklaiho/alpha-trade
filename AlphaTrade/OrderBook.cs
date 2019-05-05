@@ -14,12 +14,36 @@ namespace AlphaTrade
             this.idList.Clear();
         }
 
+        public double GetBid()
+        {
+            var res = GetBest(Side.BUY, 1);
+
+            if (res[0] != null)
+            {
+                return res[0].Price;
+            }
+
+            return 0;
+        }
+
+        public double GetAsk()
+        {
+            var res = GetBest(Side.SELL, 1);
+
+            if (res[0] != null)
+            {
+                return res[0].Price;
+            }
+
+            return 0;
+        }
+
         public OrderBookEntry[] GetBest(Side side, int count)
         {
             var result = new OrderBookEntry[count];
             int found = 0;
 
-            if (side == Side.BID)
+            if (side == Side.BUY)
             {
                 for (int i = 0; i < idList.Count && found < count; i++)
                 {
@@ -59,6 +83,13 @@ namespace AlphaTrade
 
         public void Insert(long id, int size, double price, Side side)
         {
+            if (this.book.ContainsKey(id))
+            {
+                Log.Warn("Duplicate key " + id + " in order book.");
+                this.Update(id, size, side);
+                return;
+            }
+
             this.book.Add(id, new OrderBookEntry()
             {
                 Side = side,

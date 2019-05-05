@@ -32,12 +32,12 @@
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -51,11 +51,11 @@
             this.backgroundWorkerChartData = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorkerDataFeed = new System.ComponentModel.BackgroundWorker();
             this.dataGridViewOrderBook = new System.Windows.Forms.DataGridView();
+            this.dataGridViewTrades = new System.Windows.Forms.DataGridView();
             this.ColumnBidV = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnBidP = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnAskP = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnAskV = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTrades = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
@@ -216,42 +216,6 @@
             this.dataGridViewOrderBook.Size = new System.Drawing.Size(252, 467);
             this.dataGridViewOrderBook.TabIndex = 2;
             // 
-            // ColumnBidV
-            // 
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.Format = "N0";
-            this.ColumnBidV.DefaultCellStyle = dataGridViewCellStyle2;
-            this.ColumnBidV.HeaderText = "BidV";
-            this.ColumnBidV.Name = "ColumnBidV";
-            this.ColumnBidV.ReadOnly = true;
-            // 
-            // ColumnBidP
-            // 
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.Format = "N2";
-            this.ColumnBidP.DefaultCellStyle = dataGridViewCellStyle3;
-            this.ColumnBidP.HeaderText = "BidP";
-            this.ColumnBidP.Name = "ColumnBidP";
-            this.ColumnBidP.ReadOnly = true;
-            // 
-            // ColumnAskP
-            // 
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle4.Format = "N2";
-            this.ColumnAskP.DefaultCellStyle = dataGridViewCellStyle4;
-            this.ColumnAskP.HeaderText = "AskP";
-            this.ColumnAskP.Name = "ColumnAskP";
-            this.ColumnAskP.ReadOnly = true;
-            // 
-            // ColumnAskV
-            // 
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.Format = "N0";
-            this.ColumnAskV.DefaultCellStyle = dataGridViewCellStyle5;
-            this.ColumnAskV.HeaderText = "AskV";
-            this.ColumnAskV.Name = "ColumnAskV";
-            this.ColumnAskV.ReadOnly = true;
-            // 
             // dataGridViewTrades
             // 
             this.dataGridViewTrades.AllowUserToAddRows = false;
@@ -274,8 +238,8 @@
             this.Column1,
             this.Column2});
             dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle10.BackColor = System.Drawing.Color.DarkGray;
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle10.BackColor = System.Drawing.Color.LightGray;
+            dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             dataGridViewCellStyle10.ForeColor = System.Drawing.Color.Black;
             dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.ControlLight;
             dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.ControlText;
@@ -289,12 +253,49 @@
             this.dataGridViewTrades.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridViewTrades.Size = new System.Drawing.Size(123, 467);
             this.dataGridViewTrades.TabIndex = 3;
+            this.dataGridViewTrades.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dataGridViewTrades_CellFormatting);
+            // 
+            // ColumnBidV
+            // 
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.Format = "N0";
+            this.ColumnBidV.DefaultCellStyle = dataGridViewCellStyle2;
+            this.ColumnBidV.HeaderText = "BidV";
+            this.ColumnBidV.Name = "ColumnBidV";
+            this.ColumnBidV.ReadOnly = true;
+            // 
+            // ColumnBidP
+            // 
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle3.Format = "N1";
+            this.ColumnBidP.DefaultCellStyle = dataGridViewCellStyle3;
+            this.ColumnBidP.HeaderText = "BidP";
+            this.ColumnBidP.Name = "ColumnBidP";
+            this.ColumnBidP.ReadOnly = true;
+            // 
+            // ColumnAskP
+            // 
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.Format = "N1";
+            this.ColumnAskP.DefaultCellStyle = dataGridViewCellStyle4;
+            this.ColumnAskP.HeaderText = "AskP";
+            this.ColumnAskP.Name = "ColumnAskP";
+            this.ColumnAskP.ReadOnly = true;
+            // 
+            // ColumnAskV
+            // 
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.Format = "N0";
+            this.ColumnAskV.DefaultCellStyle = dataGridViewCellStyle5;
+            this.ColumnAskV.HeaderText = "AskV";
+            this.ColumnAskV.Name = "ColumnAskV";
+            this.ColumnAskV.ReadOnly = true;
             // 
             // Column1
             // 
             this.Column1.DataPropertyName = "Price";
             dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle8.Format = "N2";
+            dataGridViewCellStyle8.Format = "N1";
             dataGridViewCellStyle8.NullValue = null;
             this.Column1.DefaultCellStyle = dataGridViewCellStyle8;
             this.Column1.HeaderText = "Price";
@@ -349,11 +350,11 @@
         private System.Windows.Forms.DataGridView dataGridViewOrderBook;
         private System.Windows.Forms.ToolStripMenuItem showMoreBarsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem showLessBarsToolStripMenuItem;
+        private System.Windows.Forms.DataGridView dataGridViewTrades;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnBidV;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnBidP;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnAskP;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnAskV;
-        private System.Windows.Forms.DataGridView dataGridViewTrades;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
     }

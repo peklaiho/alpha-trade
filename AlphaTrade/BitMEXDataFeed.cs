@@ -101,7 +101,7 @@ namespace AlphaTrade
                             Id = Convert.ToInt64(bookData[i]["id"]),
                             Price = Convert.ToDouble(bookData[i]["price"]),
                             Size = Convert.ToInt32(bookData[i]["size"]),
-                            Side = bookData[i]["side"].ToString() == "Buy" ? Side.BID : Side.ASK
+                            Side = bookData[i]["side"].ToString() == "Buy" ? Side.BUY : Side.SELL
                         };
                     }
 

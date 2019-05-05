@@ -28,27 +28,6 @@ namespace AlphaTrade
             return this.candles;
         }
 
-        public (double, double) GetMinMax(int countFromEnd)
-        {
-            double min = -1, max = -1;
-
-            for (int i = this.candles.Count - countFromEnd; i < this.candles.Count; i++)
-            {
-                var c = this.candles[i];
-
-                if (min == -1 || c.Low < min)
-                {
-                    min = c.Low;
-                }
-                if (max == -1 || c.High > max)
-                {
-                    max = c.High;
-                }
-            }
-
-            return (min, max);
-        }
-
         public int GetCandleSize()
         {
             return this.candleSize;
