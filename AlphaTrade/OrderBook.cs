@@ -85,7 +85,6 @@ namespace AlphaTrade
         {
             if (this.book.ContainsKey(id))
             {
-                Log.Warn("Duplicate key " + id + " in order book.");
                 this.Update(id, size, side);
                 return;
             }

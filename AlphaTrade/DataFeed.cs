@@ -17,7 +17,7 @@ namespace AlphaTrade
             OnOrderBook?.Invoke(this, book);
         }
 
-        public abstract void Start();
+        public abstract void Start(string symbol);
         public abstract void Stop();
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Drawing;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -10,44 +10,20 @@ namespace AlphaTrade
     {
         private IExchange exchange;
         private DataFeed dataFeed;
+        private string symbol;
 
-        private ChartData chartData;
-        private OrderBook orderBook;
-        private BindingList<DataFeedTrade> tradeHistory = new BindingList<DataFeedTrade>();
+        private IList<Action> actionQueue = new List<Action>();
+        private int actionIndex = 0;
 
-        private int shownCandles = 100;
-        private int orderBookLevels = 10;
-        private int tradesInHistory = 20;
         private int lotSize = 1;
 
-        public MainForm(IExchange exchange, DataFeed dataFeed)
+        public MainForm(IExchange exchange, DataFeed dataFeed, string symbol)
         {
             this.exchange = exchange;
             this.dataFeed = dataFeed;
-
-            this.chartData = new ChartData(300);
-            this.orderBook = new OrderBook();
+            this.symbol = symbol;
 
             InitializeComponent();
-            this.initBook();
-            this.dataGridViewTrades.DataSource = this.tradeHistory;
-        }
-
-        private void initBook()
-        {
-            for (int i = 0; i < orderBookLevels * 2; i++)
-            {
-                this.dataGridViewOrderBook.Rows.Add(null, null, null, null);
-
-                if (i < orderBookLevels)
-                {
-                    this.dataGridViewOrderBook.Rows[i].DefaultCellStyle.BackColor = Color.Salmon;
-                }
-                else
-                {
-                    this.dataGridViewOrderBook.Rows[i].DefaultCellStyle.BackColor = Color.DarkSeaGreen;
-                }
-            }
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -92,25 +68,26 @@ namespace AlphaTrade
 
                 // Other
                 case Keys.Control | Keys.NumPad0:
-                    actionCancelOrders();
+                    queueAction(new Action(Action.Types.CANCEL_ALL_ORDERS));
                     return true;
                 case Keys.Control | Keys.Delete:
-                    actionCancelPositions();
+                    queueAction(new Action(Action.Types.CLOSE_ALL_POSITIONS));
                     return true;
-
-                default:
-                    return base.ProcessCmdKey(ref msg, keyData);
             }
+
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        #region Actions
-        private void actionCancelOrders()
+        private void queueAction(Action action)
         {
-            Log.Info("Cancel all orders.");
-        }
-        private void actionCancelPositions()
-        {
-            Log.Info("Cancel all positions.");
+            this.actionQueue.Add(action);
+
+            // Start next action
+            if (!this.backgroundWorkerAction.IsBusy)
+            {
+                var next = this.actionQueue[this.actionIndex++];
+                this.backgroundWorkerAction.RunWorkerAsync(next);
+            }
         }
 
         private void createOrder(Side side, int lots, int relPrice)
@@ -125,120 +102,30 @@ namespace AlphaTrade
             {
                 if (side == Side.BUY)
                 {
-                    order.Price = orderBook.GetBid() + relPrice;
+                    order.Price = 666 + relPrice;
                 }
                 else
                 {
-                    order.Price = orderBook.GetAsk() + relPrice;
+                    order.Price = 666 + relPrice;
                 }
             }
 
             Log.Info(order.ToString());
         }
-        #endregion
 
-        #region View
-        private void updateChart()
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            var seriesData = this.chart1.Series[0].Points;
-            var candles = this.chartData.GetCandles();
-            int min = 0, max = 0;
-
-            // Update candle series
-            seriesData.Clear();
-            for (int i = candles.Count - shownCandles; i < candles.Count; i++)
+            if (this.backgroundWorkerDataFeed.IsBusy)
             {
-                var candle = candles[i];
-
-                seriesData.AddXY(
-                    candle.EndTime,
-                    candle.High,
-                    candle.Low,
-                    candle.Open,
-                    candle.Close
-                );
-
-                if (min == 0 || candle.Low < min)
-                {
-                    min = (int)candle.Low;
-                }
-                if (max == 0 || candle.High > max)
-                {
-                    max = (int)candle.High;
-                }
-            }
-
-            // Set min/max for y-axis
-            min = min - 3;
-            max = max + 3;
-            while (min % 10 != 0) min--;
-            while (max % 10 != 0) max++;
-            this.chart1.ChartAreas[0].AxisY2.Minimum = min;
-            this.chart1.ChartAreas[0].AxisY2.Maximum = max;
-
-            this.chart1.Update();
-        }
-
-        private void updateBook()
-        {
-            var asks = this.orderBook.GetBest(Side.SELL, orderBookLevels);
-            var bids = this.orderBook.GetBest(Side.BUY, orderBookLevels);
-
-            for (int i = 0; i < orderBookLevels; i++)
-            {
-                var row = this.dataGridViewOrderBook.Rows[i];
-                var entry = asks[orderBookLevels - i - 1];
-
-                row.Cells[0].Value = null;
-                row.Cells[1].Value = null;
-                row.Cells[2].Value = entry != null ? entry.Price : 0;
-                row.Cells[3].Value = entry != null ? entry.Size / 1000 : 0;
-            }
-
-            for (int i = 0; i < orderBookLevels; i++)
-            {
-                var row = this.dataGridViewOrderBook.Rows[orderBookLevels + i];
-                var entry = bids[i];
-
-                row.Cells[0].Value = entry != null ? entry.Size / 1000 : 0;
-                row.Cells[1].Value = entry != null ? entry.Price : 0;
-                row.Cells[2].Value = null;
-                row.Cells[3].Value = null;
+                this.backgroundWorkerDataFeed.CancelAsync();
             }
         }
-
-        private void dataGridViewTrades_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            if (e.ColumnIndex == 0)
-            {
-                var trade = (DataFeedTrade) this.dataGridViewTrades.Rows[e.RowIndex].DataBoundItem;
-
-                if (trade.Direction > 0)
-                {
-                    e.CellStyle.ForeColor = Color.DarkGreen;
-                }
-                else if (trade.Direction < 0)
-                {
-                    e.CellStyle.ForeColor = Color.DarkRed;
-                }
-            }
-        }
-        #endregion
 
         #region Menu
-        private void getChartDataToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (!this.backgroundWorkerChartData.IsBusy)
-            {
-                this.backgroundWorkerChartData.RunWorkerAsync();
-            }
-        }
-
         private void startDataFeedToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!this.backgroundWorkerDataFeed.IsBusy)
             {
-                this.orderBook.Clear();
                 this.backgroundWorkerDataFeed.RunWorkerAsync();
             }
         }
@@ -251,45 +138,92 @@ namespace AlphaTrade
             }
         }
 
-        private void showMoreBarsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.shownCandles < 300)
-            {
-                this.shownCandles += 50;
-                updateChart();
-            }
+            this.Close();
         }
 
-        private void showLessBarsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void chartToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (this.shownCandles > 50)
-            {
-                this.shownCandles -= 50;
-                this.updateChart();
-            }
+            queueAction(new Action(Action.Types.WINDOW_CHART));
+        }
+
+        private void orderBookToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            queueAction(new Action(Action.Types.WINDOW_ORDER_BOOK));
+        }
+
+        private void orderEntryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tradesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = new TradesForm(this.symbol);
+            form.MdiParent = this;
+            form.Show();
         }
         #endregion
 
         #region BackgroundWorkers
-        private void backgroundWorkerChartData_DoWork(object sender, DoWorkEventArgs e)
+        private void backgroundWorkerAction_DoWork(object sender, DoWorkEventArgs e)
         {
+            Action action = (Action)e.Argument;
+            e.Result = action;
+
             try
             {
-                Log.Info("Fetch chart data.");
-                exchange.GetChart(chartData);
-                e.Result = true;
+                switch (action.Type)
+                {
+                    case Action.Types.WINDOW_CHART:
+                        action.Result = exchange.GetChart(symbol, CandleSize.MIN_5);
+                        break;
+
+                    case Action.Types.WINDOW_ORDER_BOOK:
+                        action.Result = exchange.GetOrderBook(symbol);
+                        break;
+                }
             }
             catch (Exception ex)
             {
-                Log.Error(ex.Message);
+                action.Result = ex;
             }
         }
 
-        private void backgroundWorkerChartData_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void backgroundWorkerAction_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (e.Result != null)
+            Action action = (Action)e.Result;
+
+            if (action.Result is Exception)
             {
-                this.updateChart();
+                var ex = (Exception)action.Result;
+                Log.Error(ex.Message);
+                MessageBox.Show(ex.Message);
+            }
+            else
+            {
+                switch (action.Type)
+                {
+                    case Action.Types.WINDOW_CHART:
+                        var chart = new ChartForm((ChartData)action.Result, this.symbol);
+                        chart.MdiParent = this;
+                        chart.Show();
+                        break;
+
+                    case Action.Types.WINDOW_ORDER_BOOK:
+                        var book = new OrderBookForm((OrderBook)action.Result, this.symbol);
+                        book.MdiParent = this;
+                        book.Show();
+                        break;
+                }
+            }
+
+            // Start next action
+            if (this.actionQueue.Count > this.actionIndex)
+            {
+                var next = this.actionQueue[this.actionIndex++];
+                this.backgroundWorkerAction.RunWorkerAsync(next);
             }
         }
         
@@ -311,7 +245,7 @@ namespace AlphaTrade
                     worker.ReportProgress(1, book);
                 };
 
-                this.dataFeed.Start();
+                this.dataFeed.Start(this.symbol);
             }
             catch (Exception ex)
             {
@@ -339,40 +273,27 @@ namespace AlphaTrade
         {
             if (e.ProgressPercentage == 0)
             {
-                foreach (var trade in ((DataFeedTradeEventArgs)e.UserState).Trades)
+                foreach (var form in this.MdiChildren)
                 {
-                    this.chartData.Update(trade.Time, trade.Price, trade.Volume);
-
-                    this.tradeHistory.Add(trade);
-                    if (tradeHistory.Count > tradesInHistory)
+                    if (form is ChartForm)
                     {
-                        tradeHistory.RemoveAt(0);
+                        ((ChartForm)form).UpdateTrades((DataFeedTradeEventArgs)e.UserState);
+                    }
+                    else if (form is TradesForm)
+                    {
+                        ((TradesForm)form).UpdateTrades((DataFeedTradeEventArgs)e.UserState);
                     }
                 }
-
-                this.updateChart();
             }
             else if (e.ProgressPercentage == 1)
             {
-                var bookData = ((DataFeedOrderBookEventArgs)e.UserState);
-
-                foreach (var entry in bookData.Entries)
+                foreach (var form in this.MdiChildren)
                 {
-                    switch (bookData.Type)
+                    if (form is OrderBookForm)
                     {
-                        case DataFeedOrderBookEventArgs.Types.Delete:
-                            this.orderBook.Delete(entry.Id);
-                            break;
-                        case DataFeedOrderBookEventArgs.Types.Insert:
-                            this.orderBook.Insert(entry.Id, entry.Size, entry.Price, entry.Side);
-                            break;
-                        case DataFeedOrderBookEventArgs.Types.Update:
-                            this.orderBook.Update(entry.Id, entry.Size, entry.Side);
-                            break;
+                        ((OrderBookForm)form).UpdateEntries((DataFeedOrderBookEventArgs)e.UserState);
                     }
                 }
-
-                this.updateBook();
             }
         }
         #endregion

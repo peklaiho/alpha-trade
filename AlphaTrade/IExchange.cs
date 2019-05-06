@@ -2,6 +2,7 @@
 {
     public interface IExchange
     {
-        void GetChart(ChartData chartData);
+        ChartData GetChart(string symbol, CandleSize candleSize);
+        OrderBook GetOrderBook(string symbol);
     }
 }

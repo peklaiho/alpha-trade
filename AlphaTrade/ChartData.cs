@@ -6,9 +6,9 @@ namespace AlphaTrade
     public class ChartData
     {
         private IList<Candle> candles = new List<Candle>();
-        private int candleSize; // seconds
+        private CandleSize candleSize;
 
-        public ChartData(int candleSize)
+        public ChartData(CandleSize candleSize)
         {
             this.candleSize = candleSize;
         }
@@ -28,7 +28,7 @@ namespace AlphaTrade
             return this.candles;
         }
 
-        public int GetCandleSize()
+        public CandleSize GetCandleSize()
         {
             return this.candleSize;
         }
@@ -52,7 +52,7 @@ namespace AlphaTrade
                 var newCandle = new Candle()
                 {
                     StartTime = last.EndTime,
-                    EndTime = last.EndTime + candleSize,
+                    EndTime = last.EndTime + (int)candleSize,
                     Open = last.Close,
                     Close = price,
                     High = Math.Max(last.Close, price),

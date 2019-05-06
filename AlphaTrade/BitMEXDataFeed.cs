@@ -7,25 +7,23 @@ namespace AlphaTrade
     public class BitMEXDataFeed : DataFeed
     {
         private readonly string url;
-        private readonly string symbol;
 
         private WebSocket ws;
 
-        public BitMEXDataFeed(string url, string symbol)
+        public BitMEXDataFeed(string url)
         {
             this.url = url;
-            this.symbol = symbol;
         }
 
-        public override void Start()
+        public override void Start(string symbol)
         {
             string url = this.url + "/realtime";
 
             this.ws = new WebSocket(url);
             ws.OnMessage += Ws_OnMessage;
             ws.Connect();
-            this.Subscribe("trade");
-            this.Subscribe("orderBookL2_25");
+            this.Subscribe("trade", symbol);
+            this.Subscribe("orderBookL2_25", symbol);
         }
 
         public override void Stop()
@@ -36,7 +34,7 @@ namespace AlphaTrade
             }
         }
 
-        private void Subscribe(string table)
+        private void Subscribe(string table, string symbol)
         {
             var args = new JArray();
             args.Add(table + ":" + symbol);
@@ -106,7 +104,7 @@ namespace AlphaTrade
                     }
 
                     DataFeedOrderBookEventArgs.Types type;
-                    if (action == "insert" || action == "partial")
+                    if (action == "insert")
                     {
                         type = DataFeedOrderBookEventArgs.Types.Insert;
                     }
@@ -117,6 +115,11 @@ namespace AlphaTrade
                     else if (action == "delete")
                     {
                         type = DataFeedOrderBookEventArgs.Types.Delete;
+                    }
+                    else if (action == "partial")
+                    {
+                        // Ignore for now
+                        return;
                     }
                     else
                     {

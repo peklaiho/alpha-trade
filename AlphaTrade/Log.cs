@@ -10,7 +10,7 @@ namespace AlphaTrade
         public static void Init(string file)
         {
             log = new StreamWriter(file, true);
-            Info("Starting AlphaTrade");
+            Info("Starting AlphaTrade.");
         }
 
         public static void Debug(string txt)

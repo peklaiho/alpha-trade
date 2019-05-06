@@ -54,18 +54,28 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml" />
     <Reference Include="websocket-sharp, Version=1.0.2.59611, Culture=neutral, PublicKeyToken=5660b08a1845a91e, processorArchitecture=MSIL">
       <HintPath>..\packages\WebSocketSharp.1.0.3-rc11\lib\websocket-sharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Action.cs" />
     <Compile Include="BitMEX.cs" />
     <Compile Include="BitMEXDataFeed.cs" />
     <Compile Include="Candle.cs" />
+    <Compile Include="CandleSize.cs" />
     <Compile Include="ChartData.cs" />
+    <Compile Include="ChartForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChartForm.Designer.cs">
+      <DependentUpon>ChartForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataFeed.cs" />
     <Compile Include="DataFeedOrderBook.cs" />
     <Compile Include="DataFeedOrderBookEventArgs.cs" />
@@ -82,13 +92,31 @@
     <Compile Include="Order.cs" />
     <Compile Include="OrderBook.cs" />
     <Compile Include="OrderBookEntry.cs" />
+    <Compile Include="OrderBookForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OrderBookForm.Designer.cs">
+      <DependentUpon>OrderBookForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="OrderType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Side.cs" />
+    <Compile Include="TradesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TradesForm.Designer.cs">
+      <DependentUpon>TradesForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Util.cs" />
+    <EmbeddedResource Include="ChartForm.resx">
+      <DependentUpon>ChartForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrderBookForm.resx">
+      <DependentUpon>OrderBookForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -99,6 +127,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="TradesForm.resx">
+      <DependentUpon>TradesForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

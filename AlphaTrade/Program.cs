@@ -19,14 +19,14 @@ namespace AlphaTrade
             string key = ConfigurationManager.AppSettings["bitmexKey"];
             string secret = ConfigurationManager.AppSettings["bitmexSecret"];
             string symbol = ConfigurationManager.AppSettings["symbol"];
-            IExchange exchange = new BitMEX(url, key, secret, symbol);
+            IExchange exchange = new BitMEX(url, key, secret);
 
             string wsUrl = ConfigurationManager.AppSettings["bitmexWs"];
-            DataFeed feed = new BitMEXDataFeed(wsUrl, symbol);
+            DataFeed feed = new BitMEXDataFeed(wsUrl);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm(exchange, feed));
+            Application.Run(new MainForm(exchange, feed, symbol));
         }
     }
 }

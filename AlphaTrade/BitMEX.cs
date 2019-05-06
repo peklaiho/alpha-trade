@@ -13,23 +13,21 @@ namespace AlphaTrade
         private readonly string url;
         private readonly string key;
         private readonly string secret;
-        private readonly string symbol;
 
-        public BitMEX(string url, string key, string secret, string symbol)
+        public BitMEX(string url, string key, string secret)
         {
             this.url = url;
             this.key = key;
             this.secret = secret;
-            this.symbol = symbol;
         }
 
-        public void GetChart(ChartData chartData)
+        public ChartData GetChart(string symbol, CandleSize candleSize)
         {
-            chartData.Clear();
+            ChartData chartData = new ChartData(candleSize);
 
             var param = new Dictionary<string, string>();
             param["symbol"] = symbol;
-            param["binSize"] = "5m";
+            param["binSize"] = formatCandleSize(candleSize);
             param["partial"] = "true";
             param["count"] = "500";
             param["reverse"] = "true";
@@ -44,7 +42,7 @@ namespace AlphaTrade
 
                 var candle = new Candle()
                 {
-                    StartTime = endTime - chartData.GetCandleSize(),
+                    StartTime = endTime - (int)chartData.GetCandleSize(),
                     EndTime = endTime,
                     Open = Convert.ToDouble(data[i]["open"]),
                     Close = Convert.ToDouble(data[i]["close"]),
@@ -55,6 +53,32 @@ namespace AlphaTrade
 
                 chartData.Add(candle);
             }
+
+            return chartData;
+        }
+
+        public OrderBook GetOrderBook(string symbol)
+        {
+            OrderBook bookData = new OrderBook();
+
+            var param = new Dictionary<string, string>();
+            param["symbol"] = symbol;
+            param["depth"] = "50";
+
+            string rawData = Query("GET", "/orderBook/L2", param, false, false);
+            JArray data = JArray.Parse(rawData);
+
+            foreach (JObject entry in data)
+            {
+                bookData.Insert(
+                    Convert.ToInt64(entry["id"]),
+                    Convert.ToInt32(entry["size"]),
+                    Convert.ToDouble(entry["price"]),
+                    entry["side"].ToString() == "Buy" ? Side.BUY : Side.SELL
+                );
+            }
+
+            return bookData;
         }
 
         private string BuildQueryData(Dictionary<string, string> param)
@@ -99,6 +123,23 @@ namespace AlphaTrade
         private long GetExpires()
         {
             return DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 300; // set expires 5 minutes in the future
+        }
+
+        private string formatCandleSize(CandleSize size)
+        {
+            switch (size)
+            {
+                case CandleSize.MIN_1:
+                    return "1m";
+                case CandleSize.MIN_5:
+                    return "5m";
+                case CandleSize.HOUR_1:
+                    return "1h";
+                case CandleSize.DAY_1:
+                    return "1d";
+            }
+
+            return "";
         }
 
         private string Query(string method, string function, Dictionary<string, string> param = null, bool auth = false, bool json = false)

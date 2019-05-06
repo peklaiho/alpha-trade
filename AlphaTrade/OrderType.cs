@@ -5,6 +5,7 @@ namespace AlphaTrade
     enum OrderType
     {
         MARKET,
-        LIMIT
+        LIMIT,
+        STOP
     }
 }
