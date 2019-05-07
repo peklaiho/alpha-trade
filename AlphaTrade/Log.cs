@@ -1,43 +1,52 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace AlphaTrade
 {
     public static class Log
     {
+        public static IList<LogEntry> Entries = new List<LogEntry>();
+
         private static StreamWriter log;
 
         public static void Init(string file)
         {
             log = new StreamWriter(file, true);
-            Info("Starting AlphaTrade.");
+            Info("Welcome to AlphaTrade. Lets make some money!");
+        }
+
+        public static void Raw(string txt)
+        {
+            // raw network data
         }
 
         public static void Debug(string txt)
         {
-            // write("D", txt);
+            record(new LogEntry() { Level = "D", Message = txt });
         }
 
         public static void Info(string txt)
         {
-            write("I", txt);
+            record(new LogEntry() { Level = "I", Message = txt });
         }
 
         public static void Warn(string txt)
         {
-            write("W", txt);
+            record(new LogEntry() { Level = "W", Message = txt });
         }
 
         public static void Error(string txt)
         {
-            write("E", txt);
+            record(new LogEntry() { Level = "E", Message = txt });
         }
 
-        private static void write(string level, string txt)
+        private static void record(LogEntry entry)
         {
-            string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            Entries.Add(entry);
 
-            log.WriteLine(time + " :: " + level + " :: " + txt);
+            string time = entry.Time.ToString("yyyy-MM-dd HH:mm:ss");
+            log.WriteLine(time + " :: " + entry.Level + " :: " + entry.Message);
             log.Flush();
         }
     }

@@ -79,10 +79,19 @@
     <Compile Include="DataFeed.cs" />
     <Compile Include="DataFeedOrderBook.cs" />
     <Compile Include="DataFeedOrderBookEventArgs.cs" />
+    <Compile Include="DataFeedQuote.cs" />
+    <Compile Include="DataFeedQuoteEventArgs.cs" />
     <Compile Include="DataFeedTrade.cs" />
     <Compile Include="DataFeedTradeEventArgs.cs" />
     <Compile Include="IExchange.cs" />
     <Compile Include="Log.cs" />
+    <Compile Include="LogEntry.cs" />
+    <Compile Include="LogForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LogForm.Designer.cs">
+      <DependentUpon>LogForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,6 +107,12 @@
     <Compile Include="OrderBookForm.Designer.cs">
       <DependentUpon>OrderBookForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="OrderEntryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OrderEntryForm.Designer.cs">
+      <DependentUpon>OrderEntryForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="OrderType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -112,11 +127,17 @@
     <EmbeddedResource Include="ChartForm.resx">
       <DependentUpon>ChartForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="LogForm.resx">
+      <DependentUpon>LogForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OrderBookForm.resx">
       <DependentUpon>OrderBookForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrderEntryForm.resx">
+      <DependentUpon>OrderEntryForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

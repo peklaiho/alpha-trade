@@ -144,40 +144,48 @@ namespace AlphaTrade
 
         private string Query(string method, string function, Dictionary<string, string> param = null, bool auth = false, bool json = false)
         {
-            string paramData = json ? BuildJSON(param) : BuildQueryData(param);
-            string url = "/api/v1" + function + ((method == "GET" && paramData != "") ? "?" + paramData : "");
-            string postData = (method != "GET") ? paramData : "";
-
-            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(this.url + url);
-            webRequest.Method = method;
-
-            if (auth)
+            try
             {
-                string expires = GetExpires().ToString();
-                string message = method + url + expires + postData;
-                byte[] signatureBytes = hmacsha256(Encoding.UTF8.GetBytes(this.secret), Encoding.UTF8.GetBytes(message));
-                string signatureString = ByteArrayToString(signatureBytes);
+                string paramData = json ? BuildJSON(param) : BuildQueryData(param);
+                string url = "/api/v1" + function + ((method == "GET" && paramData != "") ? "?" + paramData : "");
+                string postData = (method != "GET") ? paramData : "";
 
-                webRequest.Headers.Add("api-expires", expires);
-                webRequest.Headers.Add("api-key", this.key);
-                webRequest.Headers.Add("api-signature", signatureString);
-            }
+                HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(this.url + url);
+                webRequest.Method = method;
 
-            if (postData != "")
-            {
-                webRequest.ContentType = json ? "application/json" : "application/x-www-form-urlencoded";
-                var data = Encoding.UTF8.GetBytes(postData);
-                using (var stream = webRequest.GetRequestStream())
+                if (auth)
                 {
-                    stream.Write(data, 0, data.Length);
+                    string expires = GetExpires().ToString();
+                    string message = method + url + expires + postData;
+                    byte[] signatureBytes = hmacsha256(Encoding.UTF8.GetBytes(this.secret), Encoding.UTF8.GetBytes(message));
+                    string signatureString = ByteArrayToString(signatureBytes);
+
+                    webRequest.Headers.Add("api-expires", expires);
+                    webRequest.Headers.Add("api-key", this.key);
+                    webRequest.Headers.Add("api-signature", signatureString);
+                }
+
+                if (postData != "")
+                {
+                    webRequest.ContentType = json ? "application/json" : "application/x-www-form-urlencoded";
+                    var data = Encoding.UTF8.GetBytes(postData);
+                    using (var stream = webRequest.GetRequestStream())
+                    {
+                        stream.Write(data, 0, data.Length);
+                    }
+                }
+
+                using (WebResponse webResponse = webRequest.GetResponse())
+                using (Stream str = webResponse.GetResponseStream())
+                using (StreamReader sr = new StreamReader(str))
+                {
+                    return sr.ReadToEnd();
                 }
             }
-
-            using (WebResponse webResponse = webRequest.GetResponse())
-            using (Stream str = webResponse.GetResponseStream())
-            using (StreamReader sr = new StreamReader(str))
+            catch (Exception ex)
             {
-                return sr.ReadToEnd();
+                Log.Error(ex.Message);
+                throw;
             }
         }
 

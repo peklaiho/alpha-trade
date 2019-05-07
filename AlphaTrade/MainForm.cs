@@ -13,9 +13,12 @@ namespace AlphaTrade
         private string symbol;
 
         private IList<Action> actionQueue = new List<Action>();
+        private LogForm logForm;
         private int actionIndex = 0;
 
         private int lotSize = 1;
+        private double bidPrice = 0;
+        private double askPrice = 0;
 
         public MainForm(IExchange exchange, DataFeed dataFeed, string symbol)
         {
@@ -24,6 +27,19 @@ namespace AlphaTrade
             this.symbol = symbol;
 
             InitializeComponent();
+            updateStatusStrip();
+
+            // Create log form
+            this.logForm = new LogForm();
+            logForm.MdiParent = this;
+            logForm.Show();
+        }
+
+        private void updateStatusStrip()
+        {
+            this.toolStripStatusLabelInfo.Text = 
+                "Bid: " + bidPrice.ToString("f2") +
+                "  Ask: " + askPrice.ToString("f2");
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -102,15 +118,15 @@ namespace AlphaTrade
             {
                 if (side == Side.BUY)
                 {
-                    order.Price = 666 + relPrice;
+                    order.Price = bidPrice + relPrice;
                 }
                 else
                 {
-                    order.Price = 666 + relPrice;
+                    order.Price = askPrice + relPrice;
                 }
             }
 
-            Log.Info(order.ToString());
+            Log.Info(order.ToString()); // TEMPORARY
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -118,6 +134,7 @@ namespace AlphaTrade
             if (this.backgroundWorkerDataFeed.IsBusy)
             {
                 this.backgroundWorkerDataFeed.CancelAsync();
+                Thread.Sleep(200);
             }
         }
 
@@ -143,9 +160,24 @@ namespace AlphaTrade
             this.Close();
         }
 
-        private void chartToolStripMenuItem_Click(object sender, EventArgs e)
+        private void dailyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            queueAction(new Action(Action.Types.WINDOW_CHART));
+            queueAction(new Action(Action.Types.WINDOW_CHART, CandleSize.DAY_1));
+        }
+
+        private void hourlyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            queueAction(new Action(Action.Types.WINDOW_CHART, CandleSize.HOUR_1));
+        }
+
+        private void min5ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            queueAction(new Action(Action.Types.WINDOW_CHART, CandleSize.MIN_5));
+        }
+
+        private void min1ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            queueAction(new Action(Action.Types.WINDOW_CHART, CandleSize.MIN_1));
         }
 
         private void orderBookToolStripMenuItem_Click(object sender, EventArgs e)
@@ -155,7 +187,9 @@ namespace AlphaTrade
 
         private void orderEntryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            var form = new OrderEntryForm(this.symbol, this.bidPrice, this.askPrice);
+            form.MdiParent = this;
+            form.Show();
         }
 
         private void tradesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -177,7 +211,7 @@ namespace AlphaTrade
                 switch (action.Type)
                 {
                     case Action.Types.WINDOW_CHART:
-                        action.Result = exchange.GetChart(symbol, CandleSize.MIN_5);
+                        action.Result = exchange.GetChart(symbol, (CandleSize) action.Args);
                         break;
 
                     case Action.Types.WINDOW_ORDER_BOOK:
@@ -195,14 +229,8 @@ namespace AlphaTrade
         {
             Action action = (Action)e.Result;
 
-            if (action.Result is Exception)
-            {
-                var ex = (Exception)action.Result;
-                Log.Error(ex.Message);
-                MessageBox.Show(ex.Message);
-            }
-            else
-            {
+            if (!(action.Result is Exception))
+            { 
                 switch (action.Type)
                 {
                     case Action.Types.WINDOW_CHART:
@@ -233,23 +261,25 @@ namespace AlphaTrade
 
             try
             {
-                Log.Info("Start data feed.");
+                this.dataFeed.OnQuote += (_, quote) =>
+                {
+                    worker.ReportProgress(0, quote);
+                };
 
                 this.dataFeed.OnTrade += (_, trades) =>
                 {
-                    worker.ReportProgress(0, trades);
+                    worker.ReportProgress(1, trades);
                 };
 
                 this.dataFeed.OnOrderBook += (_, book) =>
                 {
-                    worker.ReportProgress(1, book);
+                    worker.ReportProgress(2, book);
                 };
 
                 this.dataFeed.Start(this.symbol);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Log.Error(ex.Message);
                 return;
             }
 
@@ -258,20 +288,35 @@ namespace AlphaTrade
                 Thread.Sleep(50);
             }
 
-            try
-            {
-                Log.Info("Stop data feed.");
-                this.dataFeed.Stop();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-            }
+            this.dataFeed.Stop();
         }
 
         private void backgroundWorkerDataFeed_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             if (e.ProgressPercentage == 0)
+            {
+                var quotes = (DataFeedQuoteEventArgs)e.UserState;
+
+                foreach (var form in this.MdiChildren)
+                {
+                    if (form is OrderEntryForm)
+                    {
+                        ((OrderEntryForm)form).UpdateQuotes((DataFeedQuoteEventArgs)e.UserState);
+                    }
+                }
+
+                foreach (var quote in quotes.Quotes)
+                {
+                    if (quote.Symbol == this.symbol)
+                    {
+                        this.bidPrice = quote.Bid;
+                        this.askPrice = quote.Ask;
+                    }
+                }
+
+                this.updateStatusStrip();
+            }
+            else if (e.ProgressPercentage == 1)
             {
                 foreach (var form in this.MdiChildren)
                 {
@@ -285,7 +330,7 @@ namespace AlphaTrade
                     }
                 }
             }
-            else if (e.ProgressPercentage == 1)
+            else if (e.ProgressPercentage == 2)
             {
                 foreach (var form in this.MdiChildren)
                 {

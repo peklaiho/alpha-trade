@@ -17,20 +17,36 @@ namespace AlphaTrade
 
         public override void Start(string symbol)
         {
-            string url = this.url + "/realtime";
+            try
+            {
+                Log.Info("Connecting to data feed.");
 
-            this.ws = new WebSocket(url);
-            ws.OnMessage += Ws_OnMessage;
-            ws.Connect();
-            this.Subscribe("trade", symbol);
-            this.Subscribe("orderBookL2_25", symbol);
+                string url = this.url + "/realtime?subscribe=quote,trade,orderBookL2_25:" + symbol;
+
+                this.ws = new WebSocket(url);
+                ws.OnMessage += Ws_OnMessage;
+                ws.Connect();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
         }
 
         public override void Stop()
         {
             if (this.ws != null)
             {
-                this.ws.Close();
+                Log.Info("Closing data feed.");
+
+                try
+                {
+                    this.ws.Close();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.Message);
+                }
             }
         }
 
@@ -48,14 +64,21 @@ namespace AlphaTrade
 
         private void Send(string query)
         {
-            Log.Debug(">> " + query);
+            Log.Raw(">> " + query);
 
-            this.ws.Send(query);
+            try
+            {
+                this.ws.Send(query);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
         }
 
         private void Ws_OnMessage(object sender, MessageEventArgs e)
         {
-            Log.Debug("<< " + e.Data);
+            Log.Raw("<< " + e.Data);
 
             var data = JObject.Parse(e.Data);
 
@@ -64,7 +87,27 @@ namespace AlphaTrade
                 var table = data["table"].ToString();
                 var action = data["action"].ToString();
 
-                if (table == "trade")
+                if (table == "quote")
+                {
+                    if (action == "insert")
+                    {
+                        JArray quoteData = (JArray)data["data"];
+                        DataFeedQuote[] quotes = new DataFeedQuote[quoteData.Count];
+
+                        for (int i = 0; i < quoteData.Count; i++)
+                        {
+                            quotes[i] = new DataFeedQuote()
+                            {
+                                Symbol = quoteData[i]["symbol"].ToString(),
+                                Bid = Convert.ToDouble(quoteData[i]["bidPrice"]),
+                                Ask = Convert.ToDouble(quoteData[i]["askPrice"])
+                            };
+                        }
+
+                        this.RaiseOnQuote(new DataFeedQuoteEventArgs() { Quotes = quotes });
+                    }
+                }
+                else if (table == "trade")
                 {
                     if (action == "insert")
                     {
@@ -133,6 +176,19 @@ namespace AlphaTrade
                         Entries = entries
                     });
                 }
+            }
+            else if (data["info"] != null)
+            {
+                Log.Info(data["info"].ToString());
+            }
+            else if (data["success"] != null && data["subscribe"] != null)
+            {
+                Log.Debug("Subscribed to stream: " + data["subscribe"].ToString());
+            }
+            else
+            {
+                // Unknown message, log it
+                Log.Debug(e.Data);
             }
         }
 

@@ -94,7 +94,7 @@
             // ColumnBidP
             // 
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.Format = "N1";
+            dataGridViewCellStyle3.Format = "N2";
             this.ColumnBidP.DefaultCellStyle = dataGridViewCellStyle3;
             this.ColumnBidP.HeaderText = "BidP";
             this.ColumnBidP.Name = "ColumnBidP";
@@ -103,7 +103,7 @@
             // ColumnAskP
             // 
             dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle4.Format = "N1";
+            dataGridViewCellStyle4.Format = "N2";
             this.ColumnAskP.DefaultCellStyle = dataGridViewCellStyle4;
             this.ColumnAskP.HeaderText = "AskP";
             this.ColumnAskP.Name = "ColumnAskP";
@@ -125,6 +125,7 @@
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.ClientSize = new System.Drawing.Size(244, 481);
             this.Controls.Add(this.dataGridViewOrderBook);
+            this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(200, 300);
             this.Name = "OrderBookForm";
             this.Text = "OrderBookForm";

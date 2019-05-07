@@ -72,7 +72,7 @@
             // 
             this.Column1.DataPropertyName = "Price";
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.Format = "N1";
+            dataGridViewCellStyle1.Format = "N2";
             dataGridViewCellStyle1.NullValue = null;
             this.Column1.DefaultCellStyle = dataGridViewCellStyle1;
             this.Column1.HeaderText = "Price";
@@ -97,6 +97,7 @@
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.ClientSize = new System.Drawing.Size(144, 481);
             this.Controls.Add(this.dataGridViewTrades);
+            this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(150, 300);
             this.Name = "TradesForm";
             this.Text = "TradesForm";

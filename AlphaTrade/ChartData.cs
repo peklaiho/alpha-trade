@@ -33,6 +33,22 @@ namespace AlphaTrade
             return this.candleSize;
         }
 
+        public double[] SMA(int period)
+        {
+            var result = new double[this.candles.Count];
+            double sum = 0;
+
+            for (int i = 0; i < result.Length; i++) {
+                sum += this.candles[i].Close;
+                if (i >= period) {
+                    sum -= this.candles[i - period].Close;
+                }
+                result[i] = sum / Math.Min(period, i + 1);
+            }
+
+            return result;
+        }
+
         public void Update(long time, double price, long volume)
         {
             if (this.candles.Count == 0)

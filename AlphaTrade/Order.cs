@@ -4,7 +4,7 @@ namespace AlphaTrade
 {
     class Order
     {
-        public long Id;
+        public string Id;
         public Side Side;
         public OrderType Type;
         public double Price;
