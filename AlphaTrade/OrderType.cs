@@ -2,7 +2,7 @@
 
 namespace AlphaTrade
 {
-    enum OrderType
+    public enum OrderType
     {
         LIMIT,
         MARKET,

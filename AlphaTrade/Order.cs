@@ -2,9 +2,10 @@
 
 namespace AlphaTrade
 {
-    class Order
+    public class Order
     {
         public string Id;
+        public string Symbol;
         public Side Side;
         public OrderType Type;
         public double Price;
@@ -13,7 +14,7 @@ namespace AlphaTrade
         public override string ToString()
         {
             string str = (Side == Side.BUY) ? "BUY " : "SELL ";
-            str += Size + " at ";
+            str += Size + " " + Symbol + " at ";
             str += (Type == OrderType.MARKET) ? "MARKET" : Price.ToString("f2");
             return str;
         }

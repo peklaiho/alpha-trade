@@ -32,12 +32,6 @@ namespace AlphaTrade
                 }
                 this.textBox1.AppendText(Log.Entries[index].ToString());
             }
-
-            // Scroll to bottom if we added new rows
-            if (index > startIndex)
-            {
-                // this.textBox1.scr
-            }
         }
     }
 }

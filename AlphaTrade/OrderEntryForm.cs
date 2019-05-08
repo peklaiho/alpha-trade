@@ -6,18 +6,23 @@ namespace AlphaTrade
     public partial class OrderEntryForm : Form
     {
         private string symbol;
+        private int lotSize;
         private double bidPrice;
         private double askPrice;
 
-        public OrderEntryForm(string symbol, double bid, double ask)
+        public OrderEntryForm(string symbol, int lotSize, double tickSize, double bid, double ask)
         {
             this.symbol = symbol;
+            this.lotSize = lotSize;
             this.bidPrice = bid;
             this.askPrice = ask;
 
             InitializeComponent();
 
+            this.Text = symbol;
+            this.numericPrice.Increment = (decimal) tickSize;
             this.comboType.SelectedIndex = 0;
+
             this.updateBidAsk();
         }
 
@@ -43,12 +48,24 @@ namespace AlphaTrade
 
         private void buttonBuy_Click(object sender, EventArgs e)
         {
-
+            ((MainForm)this.MdiParent).CreateOrder(makeOrder(Side.BUY));
         }
 
         private void buttonSell_Click(object sender, EventArgs e)
         {
+            ((MainForm)this.MdiParent).CreateOrder(makeOrder(Side.SELL));
+        }
 
+        private Order makeOrder(Side side)
+        {
+            return new Order()
+            {
+                Symbol = symbol,
+                Side = side,
+                Type = (OrderType)this.comboType.SelectedIndex,
+                Price = (double)this.numericPrice.Value,
+                Size = this.lotSize * (int)this.numericSize.Value
+            };
         }
 
         private void labelBid_Click(object sender, EventArgs e)

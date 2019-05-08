@@ -10,6 +10,7 @@ namespace AlphaTrade
             WINDOW_ORDER_BOOK,
 
             CREATE_ORDER,
+            MODIFY_ORDER,
             CANCEL_ORDER,
             CANCEL_ALL_ORDERS,
 

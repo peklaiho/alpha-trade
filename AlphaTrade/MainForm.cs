@@ -12,11 +12,12 @@ namespace AlphaTrade
         private DataFeed dataFeed;
         private string symbol;
 
-        private IList<Action> actionQueue = new List<Action>();
         private LogForm logForm;
+        private IList<Action> actionQueue = new List<Action>();
         private int actionIndex = 0;
 
-        private int lotSize = 1;
+        private int lotSize = 10;
+        private double tickSize = 0.5;
         private double bidPrice = 0;
         private double askPrice = 0;
 
@@ -35,6 +36,24 @@ namespace AlphaTrade
             logForm.Show();
         }
 
+        public void CreateOrder(Order order)
+        {
+            Log.Info("New order: " + order.ToString());
+            queueAction(new Action(Action.Types.CREATE_ORDER, order));
+        }
+
+        public void ModifyOrder(Order order)
+        {
+            Log.Info("Modify order: " + order.Id + " (price " + order.Price.ToString("f2") + ")");
+            queueAction(new Action(Action.Types.MODIFY_ORDER, order));
+        }
+
+        public void CancelOrder(Order order)
+        {
+            Log.Info("Cancel order: " + order.Id);
+            queueAction(new Action(Action.Types.CANCEL_ORDER, order));
+        }
+
         private void updateStatusStrip()
         {
             this.toolStripStatusLabelInfo.Text = 
@@ -48,38 +67,38 @@ namespace AlphaTrade
             {
                 // Market orders
                 case Keys.Control | Keys.Up:
-                    createOrder(Side.BUY, 1, 999);
+                    hotkeyOrder(Side.BUY, 1, 999);
                     return true;
                 case Keys.Control | Keys.Down:
-                    createOrder(Side.SELL, 1, 999);
+                    hotkeyOrder(Side.SELL, 1, 999);
                     return true;
 
                 // Limit buys
                 case Keys.Control | Keys.Add:
-                    createOrder(Side.BUY, 1, 0);
+                    hotkeyOrder(Side.BUY, 1, 0);
                     return true;
                 case Keys.Control | Keys.NumPad1:
-                    createOrder(Side.BUY, 1, -1);
+                    hotkeyOrder(Side.BUY, 1, -1);
                     return true;
                 case Keys.Control | Keys.NumPad2:
-                    createOrder(Side.BUY, 1, -2);
+                    hotkeyOrder(Side.BUY, 1, -2);
                     return true;
                 case Keys.Control | Keys.NumPad3:
-                    createOrder(Side.BUY, 1, -3);
+                    hotkeyOrder(Side.BUY, 1, -3);
                     return true;
 
                 // Limit sells
                 case Keys.Control | Keys.Subtract:
-                    createOrder(Side.SELL, 1, 0);
+                    hotkeyOrder(Side.SELL, 1, 0);
                     return true;
                 case Keys.Control | Keys.NumPad7:
-                    createOrder(Side.SELL, 1, +1);
+                    hotkeyOrder(Side.SELL, 1, +1);
                     return true;
                 case Keys.Control | Keys.NumPad8:
-                    createOrder(Side.SELL, 1, +2);
+                    hotkeyOrder(Side.SELL, 1, +2);
                     return true;
                 case Keys.Control | Keys.NumPad9:
-                    createOrder(Side.SELL, 1, +3);
+                    hotkeyOrder(Side.SELL, 1, +3);
                     return true;
 
                 // Other
@@ -106,9 +125,9 @@ namespace AlphaTrade
             }
         }
 
-        private void createOrder(Side side, int lots, int relPrice)
+        private void hotkeyOrder(Side side, int lots, int relPrice)
         {
-            var order = new Order() { Side = side, Size = lotSize * lots, Type = OrderType.LIMIT };
+            var order = new Order() { Symbol = symbol, Side = side, Size = lotSize * lots, Type = OrderType.LIMIT };
 
             if (relPrice == 999)
             {
@@ -126,7 +145,7 @@ namespace AlphaTrade
                 }
             }
 
-            Log.Info(order.ToString()); // TEMPORARY
+            this.CreateOrder(order);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -187,7 +206,7 @@ namespace AlphaTrade
 
         private void orderEntryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = new OrderEntryForm(this.symbol, this.bidPrice, this.askPrice);
+            var form = new OrderEntryForm(this.symbol, this.lotSize, this.tickSize, this.bidPrice, this.askPrice);
             form.MdiParent = this;
             form.Show();
         }
@@ -210,10 +229,21 @@ namespace AlphaTrade
             {
                 switch (action.Type)
                 {
+                    // Orders
+                    case Action.Types.CREATE_ORDER:
+                        exchange.CreateOrder((Order)action.Args);
+                        break;
+                    case Action.Types.MODIFY_ORDER:
+                        exchange.ModifyOrder((Order)action.Args);
+                        break;
+                    case Action.Types.CANCEL_ORDER:
+                        exchange.CancelOrder((Order)action.Args);
+                        break;
+
+                    // Windows
                     case Action.Types.WINDOW_CHART:
                         action.Result = exchange.GetChart(symbol, (CandleSize) action.Args);
                         break;
-
                     case Action.Types.WINDOW_ORDER_BOOK:
                         action.Result = exchange.GetOrderBook(symbol);
                         break;

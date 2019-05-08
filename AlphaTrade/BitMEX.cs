@@ -81,6 +81,28 @@ namespace AlphaTrade
             return bookData;
         }
 
+        #region Orders
+        public void CreateOrder(Order order)
+        {
+
+        }
+
+        public void ModifyOrder(Order order)
+        {
+
+        }
+
+        public void CancelOrder(Order order)
+        {
+
+        }
+
+        public Order[] GetOrders()
+        {
+            return null;
+        }
+        #endregion
+
         private string BuildQueryData(Dictionary<string, string> param)
         {
             if (param == null)
