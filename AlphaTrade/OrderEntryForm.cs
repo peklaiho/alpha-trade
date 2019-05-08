@@ -6,20 +6,20 @@ namespace AlphaTrade
     public partial class OrderEntryForm : Form
     {
         private string symbol;
-        private int lotSize;
         private double bidPrice;
         private double askPrice;
 
         public OrderEntryForm(string symbol, int lotSize, double tickSize, double bid, double ask)
         {
             this.symbol = symbol;
-            this.lotSize = lotSize;
             this.bidPrice = bid;
             this.askPrice = ask;
 
             InitializeComponent();
 
             this.Text = symbol;
+            this.numericSize.Minimum = (decimal)lotSize;
+            this.numericSize.Increment = (decimal)lotSize;
             this.numericPrice.Increment = (decimal) tickSize;
             this.comboType.SelectedIndex = 0;
 
@@ -64,7 +64,7 @@ namespace AlphaTrade
                 Side = side,
                 Type = (OrderType)this.comboType.SelectedIndex,
                 Price = (double)this.numericPrice.Value,
-                Size = this.lotSize * (int)this.numericSize.Value
+                Size = (int)this.numericSize.Value
             };
         }
 
