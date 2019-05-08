@@ -77,11 +77,11 @@
       <DependentUpon>ChartForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DataFeed.cs" />
-    <Compile Include="DataFeedOrderBook.cs" />
     <Compile Include="DataFeedOrderBookEventArgs.cs" />
-    <Compile Include="DataFeedQuote.cs" />
+    <Compile Include="Position.cs" />
+    <Compile Include="Quote.cs" />
     <Compile Include="DataFeedQuoteEventArgs.cs" />
-    <Compile Include="DataFeedTrade.cs" />
+    <Compile Include="Trade.cs" />
     <Compile Include="DataFeedTradeEventArgs.cs" />
     <Compile Include="IExchange.cs" />
     <Compile Include="Log.cs" />
@@ -114,6 +114,12 @@
       <DependentUpon>OrderEntryForm.cs</DependentUpon>
     </Compile>
     <Compile Include="OrderType.cs" />
+    <Compile Include="PositionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PositionsForm.Designer.cs">
+      <DependentUpon>PositionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Side.cs" />
@@ -138,6 +144,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="OrderEntryForm.resx">
       <DependentUpon>OrderEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PositionsForm.resx">
+      <DependentUpon>PositionsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

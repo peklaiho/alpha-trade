@@ -199,6 +199,11 @@ namespace AlphaTrade
             queueAction(new Action(Action.Types.WINDOW_CHART, CandleSize.MIN_1));
         }
 
+        private void positionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            queueAction(new Action(Action.Types.WINDOW_POSITIONS));
+        }
+
         private void orderBookToolStripMenuItem_Click(object sender, EventArgs e)
         {
             queueAction(new Action(Action.Types.WINDOW_ORDER_BOOK));
@@ -241,6 +246,9 @@ namespace AlphaTrade
                         break;
 
                     // Windows
+                    case Action.Types.WINDOW_POSITIONS:
+                        action.Result = exchange.GetPositions();
+                        break;
                     case Action.Types.WINDOW_CHART:
                         action.Result = exchange.GetChart(symbol, (CandleSize) action.Args);
                         break;
@@ -263,6 +271,12 @@ namespace AlphaTrade
             { 
                 switch (action.Type)
                 {
+                    case Action.Types.WINDOW_POSITIONS:
+                        var pos = new PositionsForm((Position[])action.Result);
+                        pos.MdiParent = this;
+                        pos.Show();
+                        break;
+
                     case Action.Types.WINDOW_CHART:
                         var chart = new ChartForm((ChartData)action.Result, this.symbol);
                         chart.MdiParent = this;
@@ -332,6 +346,10 @@ namespace AlphaTrade
                     if (form is OrderEntryForm)
                     {
                         ((OrderEntryForm)form).UpdateQuotes((DataFeedQuoteEventArgs)e.UserState);
+                    }
+                    else if (form is PositionsForm)
+                    {
+                        ((PositionsForm)form).UpdateQuotes((DataFeedQuoteEventArgs)e.UserState);
                     }
                 }
 

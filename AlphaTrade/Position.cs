@@ -2,12 +2,10 @@
 
 namespace AlphaTrade
 {
-    public class OrderBookEntry
+    public class Position
     {
         public string Symbol;
-        public long Id;
-        public Side Side;
-        public double Price;
         public int Size;
+        public double Price;
     }
 }

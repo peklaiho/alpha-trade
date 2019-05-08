@@ -12,6 +12,6 @@ namespace AlphaTrade
         };
 
         public Types Type;
-        public DataFeedOrderBook[] Entries;
+        public OrderBookEntry[] Entries;
     }
 }

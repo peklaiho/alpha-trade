@@ -36,7 +36,7 @@ namespace AlphaTrade
                     }
                     else if (e.Type == DataFeedOrderBookEventArgs.Types.Insert)
                     {
-                        this.data.Insert(entry.Id, entry.Size, entry.Price, entry.Side);
+                        this.data.Insert(entry);
                     }
                     else
                     {

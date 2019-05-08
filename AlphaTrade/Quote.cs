@@ -1,6 +1,6 @@
 ﻿namespace AlphaTrade
 {
-    public class DataFeedQuote
+    public class Quote
     {
         public string Symbol;
         public double Bid;

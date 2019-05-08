@@ -1,6 +1,6 @@
 ﻿namespace AlphaTrade
 {
-    public class DataFeedTrade
+    public class Trade
     {
         public string Symbol;
         public long Time;

@@ -9,7 +9,7 @@ namespace AlphaTrade
     {
         private string symbol;
 
-        private BindingList<DataFeedTrade> data = new BindingList<DataFeedTrade>();
+        private BindingList<Trade> data = new BindingList<Trade>();
         private int tradesInHistory = 20;
 
         public TradesForm(string symbol)
@@ -41,7 +41,7 @@ namespace AlphaTrade
         {
             if (e.ColumnIndex == 0)
             {
-                var trade = (DataFeedTrade)this.dataGridViewTrades.Rows[e.RowIndex].DataBoundItem;
+                var trade = (Trade)this.dataGridViewTrades.Rows[e.RowIndex].DataBoundItem;
 
                 if (trade.Direction > 0)
                 {

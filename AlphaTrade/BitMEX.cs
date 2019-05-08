@@ -68,20 +68,22 @@ namespace AlphaTrade
             string rawData = Query("GET", "/orderBook/L2", param, false, false);
             JArray data = JArray.Parse(rawData);
 
-            foreach (JObject entry in data)
+            foreach (JObject entryData in data)
             {
-                bookData.Insert(
-                    Convert.ToInt64(entry["id"]),
-                    Convert.ToInt32(entry["size"]),
-                    Convert.ToDouble(entry["price"]),
-                    entry["side"].ToString() == "Buy" ? Side.BUY : Side.SELL
-                );
+                var entry = new OrderBookEntry()
+                {
+                    Id = Convert.ToInt64(entryData["id"]),
+                    Size = Convert.ToInt32(entryData["size"]),
+                    Price = Convert.ToDouble(entryData["price"]),
+                    Side = entryData["side"].ToString() == "Buy" ? Side.BUY : Side.SELL
+                };
+
+                bookData.Insert(entry);
             }
 
             return bookData;
         }
 
-        #region Orders
         public void CreateOrder(Order order)
         {
 
@@ -101,7 +103,25 @@ namespace AlphaTrade
         {
             return null;
         }
-        #endregion
+
+        public Position[] GetPositions()
+        {
+            return new Position[]
+            {
+                new Position()
+                {
+                    Symbol = "XBTUSD",
+                    Size = 12,
+                    Price = 5820.65
+                },
+                new Position()
+                {
+                    Symbol = "XBTUSD",
+                    Size = -8,
+                    Price = 5830.34
+                }
+            };
+        }
 
         private string BuildQueryData(Dictionary<string, string> param)
         {

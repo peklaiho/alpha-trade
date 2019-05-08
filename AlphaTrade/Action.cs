@@ -6,6 +6,7 @@ namespace AlphaTrade
     {
         public enum Types
         {
+            WINDOW_POSITIONS,
             WINDOW_CHART,
             WINDOW_ORDER_BOOK,
 

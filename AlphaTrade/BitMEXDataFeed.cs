@@ -92,11 +92,11 @@ namespace AlphaTrade
                     if (action == "insert")
                     {
                         JArray quoteData = (JArray)data["data"];
-                        DataFeedQuote[] quotes = new DataFeedQuote[quoteData.Count];
+                        Quote[] quotes = new Quote[quoteData.Count];
 
                         for (int i = 0; i < quoteData.Count; i++)
                         {
-                            quotes[i] = new DataFeedQuote()
+                            quotes[i] = new Quote()
                             {
                                 Symbol = quoteData[i]["symbol"].ToString(),
                                 Bid = Convert.ToDouble(quoteData[i]["bidPrice"]),
@@ -112,11 +112,11 @@ namespace AlphaTrade
                     if (action == "insert")
                     {
                         JArray tradeData = (JArray)data["data"];
-                        DataFeedTrade[] trades = new DataFeedTrade[tradeData.Count];
+                        Trade[] trades = new Trade[tradeData.Count];
 
                         for (int i = 0; i < tradeData.Count; i++)
                         {
-                            trades[i] = new DataFeedTrade()
+                            trades[i] = new Trade()
                             {
                                 Symbol = tradeData[i]["symbol"].ToString(),
                                 Time = Util.ParseUnixTimestamp(tradeData[i]["timestamp"].ToString()),
@@ -132,11 +132,11 @@ namespace AlphaTrade
                 else if (table == "orderBookL2_25")
                 {
                     JArray bookData = (JArray)data["data"];
-                    DataFeedOrderBook[] entries = new DataFeedOrderBook[bookData.Count];
+                    OrderBookEntry[] entries = new OrderBookEntry[bookData.Count];
 
                     for (int i = 0; i < bookData.Count; i++)
                     {
-                        entries[i] = new DataFeedOrderBook()
+                        entries[i] = new OrderBookEntry()
                         {
                             Symbol = bookData[i]["symbol"].ToString(),
                             Id = Convert.ToInt64(bookData[i]["id"]),

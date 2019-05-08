@@ -4,6 +4,6 @@ namespace AlphaTrade
 {
     public class DataFeedTradeEventArgs : EventArgs
     {
-        public DataFeedTrade[] Trades;
+        public Trade[] Trades;
     }
 }

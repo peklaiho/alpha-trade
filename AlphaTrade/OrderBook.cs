@@ -81,22 +81,17 @@ namespace AlphaTrade
             this.book[id].Side = side;
         }
 
-        public void Insert(long id, int size, double price, Side side)
+        public void Insert(OrderBookEntry entry)
         {
-            if (this.book.ContainsKey(id))
+            if (this.book.ContainsKey(entry.Id))
             {
-                this.Update(id, size, side);
+                this.Update(entry.Id, entry.Size, entry.Side);
                 return;
             }
 
-            this.book.Add(id, new OrderBookEntry()
-            {
-                Side = side,
-                Price = price,
-                Size = size
-            });
+            this.book.Add(entry.Id, entry);
 
-            this.idList.Add(id);
+            this.idList.Add(entry.Id);
             this.idList.Sort();
         }
     }
