@@ -42,16 +42,22 @@ namespace AlphaTrade
             queueAction(new Action(Action.Types.CREATE_ORDER, order));
         }
 
-        public void ModifyOrder(Order order)
+        public void ModifyOrder(string id, int size, double price)
         {
-            Log.Info("Modify order: " + order.Id + " (price " + order.Price.ToString("f2") + ")");
-            queueAction(new Action(Action.Types.MODIFY_ORDER, order));
+            Log.Info("Modify order: " + id + " (size " + size + ", price " + price.ToString("f2") + ")");
+            queueAction(new Action(Action.Types.MODIFY_ORDER, (id, size, price)));
         }
 
-        public void CancelOrder(Order order)
+        public void CancelOrder(string id)
         {
-            Log.Info("Cancel order: " + order.Id);
-            queueAction(new Action(Action.Types.CANCEL_ORDER, order));
+            Log.Info("Cancel order: " + id);
+            queueAction(new Action(Action.Types.CANCEL_ORDER, id));
+        }
+
+        public void ClosePosition(string symbol)
+        {
+            Log.Info("Close position: " + symbol);
+            queueAction(new Action(Action.Types.CLOSE_POSITION, symbol));
         }
 
         private void updateStatusStrip()
@@ -204,6 +210,11 @@ namespace AlphaTrade
             queueAction(new Action(Action.Types.WINDOW_POSITIONS));
         }
 
+        private void ordersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            queueAction(new Action(Action.Types.WINDOW_ORDERS));
+        }
+
         private void orderBookToolStripMenuItem_Click(object sender, EventArgs e)
         {
             queueAction(new Action(Action.Types.WINDOW_ORDER_BOOK));
@@ -239,13 +250,17 @@ namespace AlphaTrade
                         exchange.CreateOrder((Order)action.Args);
                         break;
                     case Action.Types.MODIFY_ORDER:
-                        exchange.ModifyOrder((Order)action.Args);
+                        var args = ((string, int, double))action.Args;
+                        exchange.ModifyOrder(args.Item1, args.Item2, args.Item3);
                         break;
                     case Action.Types.CANCEL_ORDER:
-                        exchange.CancelOrder((Order)action.Args);
+                        exchange.CancelOrder((string)action.Args);
                         break;
 
                     // Windows
+                    case Action.Types.WINDOW_ORDERS:
+                        action.Result = exchange.GetOrders();
+                        break;
                     case Action.Types.WINDOW_POSITIONS:
                         action.Result = exchange.GetPositions();
                         break;
@@ -254,6 +269,10 @@ namespace AlphaTrade
                         break;
                     case Action.Types.WINDOW_ORDER_BOOK:
                         action.Result = exchange.GetOrderBook(symbol);
+                        break;
+
+                    default:
+                        Log.Error("Unhandled action: " + action.Type);
                         break;
                 }
             }
@@ -271,6 +290,12 @@ namespace AlphaTrade
             { 
                 switch (action.Type)
                 {
+                    case Action.Types.WINDOW_ORDERS:
+                        var orders = new OrdersForm((Order[])action.Result);
+                        orders.MdiParent = this;
+                        orders.Show();
+                        break;
+
                     case Action.Types.WINDOW_POSITIONS:
                         var pos = new PositionsForm((Position[])action.Result);
                         pos.MdiParent = this;

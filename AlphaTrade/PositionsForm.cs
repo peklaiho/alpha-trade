@@ -70,5 +70,15 @@ namespace AlphaTrade
                 }
             }
         }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 4)
+            {
+                var symbol = (string)this.dataGridView1.Rows[e.RowIndex].Cells[0].Value;
+
+                ((MainForm)this.MdiParent).ClosePosition(symbol);
+            }
+        }
     }
 }

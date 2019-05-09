@@ -18,5 +18,17 @@ namespace AlphaTrade
             str += (Type == OrderType.MARKET) ? "MARKET" : Price.ToString("f2");
             return str;
         }
+
+        public string TypeToString()
+        {
+            string str = "";
+
+            if (Type == OrderType.STOP)
+            {
+                str = "STOP ";
+            }
+
+            return str + ((Side == Side.BUY) ? "BUY" : "SELL");
+        }
     }
 }

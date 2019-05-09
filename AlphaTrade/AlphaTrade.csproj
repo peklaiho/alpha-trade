@@ -78,6 +78,12 @@
     </Compile>
     <Compile Include="DataFeed.cs" />
     <Compile Include="DataFeedOrderBookEventArgs.cs" />
+    <Compile Include="OrdersForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OrdersForm.Designer.cs">
+      <DependentUpon>OrdersForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Position.cs" />
     <Compile Include="Quote.cs" />
     <Compile Include="DataFeedQuoteEventArgs.cs" />
@@ -144,6 +150,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="OrderEntryForm.resx">
       <DependentUpon>OrderEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrdersForm.resx">
+      <DependentUpon>OrdersForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PositionsForm.resx">
       <DependentUpon>PositionsForm.cs</DependentUpon>

@@ -89,19 +89,48 @@ namespace AlphaTrade
 
         }
 
-        public void ModifyOrder(Order order)
+        public void ModifyOrder(string id, int size, double price)
         {
 
         }
 
-        public void CancelOrder(Order order)
+        public void CancelOrder(string id)
         {
 
         }
 
         public Order[] GetOrders()
         {
-            return null;
+            return new Order[]
+            {
+                new Order()
+                {
+                    Id = "abc123",
+                    Symbol = "XBTUSD",
+                    Side = Side.BUY,
+                    Type = OrderType.LIMIT,
+                    Price = 5799.50,
+                    Size = 12
+                },
+                new Order()
+                {
+                    Id = "efg456",
+                    Symbol = "XBTUSD",
+                    Side = Side.SELL,
+                    Type = OrderType.MARKET,
+                    Price = 6112.00,
+                    Size = 8
+                },
+                new Order()
+                {
+                    Id = "ggg666",
+                    Symbol = "XBTUSD",
+                    Side = Side.SELL,
+                    Type = OrderType.STOP,
+                    Price = 6354.00,
+                    Size = 44
+                }
+            };
         }
 
         public Position[] GetPositions()
@@ -116,7 +145,7 @@ namespace AlphaTrade
                 },
                 new Position()
                 {
-                    Symbol = "XBTUSD",
+                    Symbol = "ETHUSD",
                     Size = -8,
                     Price = 5830.34
                 }
