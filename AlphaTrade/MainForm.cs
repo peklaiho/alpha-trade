@@ -13,8 +13,6 @@ namespace AlphaTrade
         private string symbol;
 
         private LogForm logForm;
-        private IList<Action> actionQueue = new List<Action>();
-        private int actionIndex = 0;
 
         private int lotSize = 10;
         private double tickSize = 0.5;
@@ -121,14 +119,10 @@ namespace AlphaTrade
 
         private void queueAction(Action action)
         {
-            this.actionQueue.Add(action);
-
-            // Start next action
-            if (!this.backgroundWorkerAction.IsBusy)
-            {
-                var next = this.actionQueue[this.actionIndex++];
-                this.backgroundWorkerAction.RunWorkerAsync(next);
-            }
+            var bg = new BackgroundWorker();
+            bg.DoWork += this.backgroundWorkerAction_DoWork;
+            bg.RunWorkerCompleted += this.backgroundWorkerAction_RunWorkerCompleted;
+            bg.RunWorkerAsync(action);
         }
 
         private void hotkeyOrder(Side side, int lots, int relPrice)
@@ -314,13 +308,6 @@ namespace AlphaTrade
                         book.Show();
                         break;
                 }
-            }
-
-            // Start next action
-            if (this.actionQueue.Count > this.actionIndex)
-            {
-                var next = this.actionQueue[this.actionIndex++];
-                this.backgroundWorkerAction.RunWorkerAsync(next);
             }
         }
         

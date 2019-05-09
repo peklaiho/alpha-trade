@@ -39,15 +39,14 @@
             this.hourlyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.minToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.minToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.positionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.orderBookToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.orderEntryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.positionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ordersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tradesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.backgroundWorkerAction = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorkerDataFeed = new System.ComponentModel.BackgroundWorker();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabelInfo = new System.Windows.Forms.ToolStripStatusLabel();
-            this.ordersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -115,7 +114,7 @@
             this.minToolStripMenuItem,
             this.minToolStripMenuItem1});
             this.chartToolStripMenuItem.Name = "chartToolStripMenuItem";
-            this.chartToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.chartToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
             this.chartToolStripMenuItem.Text = "Chart";
             // 
             // dailyToolStripMenuItem
@@ -146,38 +145,40 @@
             this.minToolStripMenuItem1.Text = "1 Min";
             this.minToolStripMenuItem1.Click += new System.EventHandler(this.min1ToolStripMenuItem_Click);
             // 
-            // positionsToolStripMenuItem
-            // 
-            this.positionsToolStripMenuItem.Name = "positionsToolStripMenuItem";
-            this.positionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.positionsToolStripMenuItem.Text = "Positions";
-            this.positionsToolStripMenuItem.Click += new System.EventHandler(this.positionsToolStripMenuItem_Click);
-            // 
             // orderBookToolStripMenuItem
             // 
             this.orderBookToolStripMenuItem.Name = "orderBookToolStripMenuItem";
-            this.orderBookToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.orderBookToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
             this.orderBookToolStripMenuItem.Text = "Order Book";
             this.orderBookToolStripMenuItem.Click += new System.EventHandler(this.orderBookToolStripMenuItem_Click);
             // 
             // orderEntryToolStripMenuItem
             // 
             this.orderEntryToolStripMenuItem.Name = "orderEntryToolStripMenuItem";
-            this.orderEntryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.orderEntryToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
             this.orderEntryToolStripMenuItem.Text = "Order Entry";
             this.orderEntryToolStripMenuItem.Click += new System.EventHandler(this.orderEntryToolStripMenuItem_Click);
+            // 
+            // positionsToolStripMenuItem
+            // 
+            this.positionsToolStripMenuItem.Name = "positionsToolStripMenuItem";
+            this.positionsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.positionsToolStripMenuItem.Text = "Positions";
+            this.positionsToolStripMenuItem.Click += new System.EventHandler(this.positionsToolStripMenuItem_Click);
+            // 
+            // ordersToolStripMenuItem
+            // 
+            this.ordersToolStripMenuItem.Name = "ordersToolStripMenuItem";
+            this.ordersToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.ordersToolStripMenuItem.Text = "Orders";
+            this.ordersToolStripMenuItem.Click += new System.EventHandler(this.ordersToolStripMenuItem_Click);
             // 
             // tradesToolStripMenuItem
             // 
             this.tradesToolStripMenuItem.Name = "tradesToolStripMenuItem";
-            this.tradesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.tradesToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
             this.tradesToolStripMenuItem.Text = "Trades";
             this.tradesToolStripMenuItem.Click += new System.EventHandler(this.tradesToolStripMenuItem_Click);
-            // 
-            // backgroundWorkerAction
-            // 
-            this.backgroundWorkerAction.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorkerAction_DoWork);
-            this.backgroundWorkerAction.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorkerAction_RunWorkerCompleted);
             // 
             // backgroundWorkerDataFeed
             // 
@@ -201,13 +202,6 @@
             this.toolStripStatusLabelInfo.BackColor = System.Drawing.SystemColors.Control;
             this.toolStripStatusLabelInfo.Name = "toolStripStatusLabelInfo";
             this.toolStripStatusLabelInfo.Size = new System.Drawing.Size(0, 17);
-            // 
-            // ordersToolStripMenuItem
-            // 
-            this.ordersToolStripMenuItem.Name = "ordersToolStripMenuItem";
-            this.ordersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.ordersToolStripMenuItem.Text = "Orders";
-            this.ordersToolStripMenuItem.Click += new System.EventHandler(this.ordersToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -237,7 +231,6 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem menuToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem startDataFeedToolStripMenuItem;
-        private System.ComponentModel.BackgroundWorker backgroundWorkerAction;
         private System.Windows.Forms.ToolStripMenuItem stopDataFeedToolStripMenuItem;
         private System.ComponentModel.BackgroundWorker backgroundWorkerDataFeed;
         private System.Windows.Forms.ToolStripMenuItem windowToolStripMenuItem;
