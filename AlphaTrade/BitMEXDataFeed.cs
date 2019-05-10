@@ -1,18 +1,23 @@
 ﻿using System;
 using WebSocketSharp;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace AlphaTrade
 {
     public class BitMEXDataFeed : DataFeed
     {
         private readonly string url;
+        private readonly string key;
+        private readonly string secret;
 
         private WebSocket ws;
 
-        public BitMEXDataFeed(string url)
+        public BitMEXDataFeed(string url, string key, string secret)
         {
             this.url = url;
+            this.key = key;
+            this.secret = secret;
         }
 
         public override void Start(string symbol)
@@ -21,11 +26,21 @@ namespace AlphaTrade
             {
                 Log.Info("Connecting to data feed.");
 
-                string url = this.url + "/realtime?subscribe=quote,trade,orderBookL2_25:" + symbol;
+                string endpoint = "/realtime";
+                string expires = Util.BitmexExpires();
+                string signature = Util.BitmexSignature(this.secret, "GET", endpoint, expires, "");
+
+                string url = this.url + endpoint + "?api-expires=" + expires + "&api-signature=" + signature + "&api-key=" + this.key;
 
                 this.ws = new WebSocket(url);
                 ws.OnMessage += Ws_OnMessage;
                 ws.Connect();
+
+                Subscribe("quote", symbol);
+                Subscribe("trade", symbol);
+                Subscribe("orderBookL2_25", symbol);
+
+                Subscribe("execution");
             }
             catch (Exception ex)
             {
@@ -50,10 +65,18 @@ namespace AlphaTrade
             }
         }
 
-        private void Subscribe(string table, string symbol)
+        private void Subscribe(string table, string symbol = null)
         {
             var args = new JArray();
-            args.Add(table + ":" + symbol);
+
+            if (symbol != null)
+            {
+                args.Add(table + ":" + symbol);
+            }
+            else
+            {
+                args.Add(table);
+            }
 
             var q = new JObject();
             q["op"] = "subscribe";
@@ -176,6 +199,41 @@ namespace AlphaTrade
                         Entries = entries
                     });
                 }
+                else if (table == "execution")
+                {
+                    if (action == "insert")
+                    {
+                        JArray execData = (JArray)data["data"];
+                        List<Execution> executions = new List<Execution>();
+
+                        for (int i = 0; i < execData.Count; i++)
+                        {
+                            if (execData[i]["ordStatus"].ToString() == "Filled")
+                            {
+                                executions.Add(new Execution()
+                                {
+                                    OrderId = execData[i]["orderID"].ToString(),
+                                    Symbol = execData[i]["symbol"].ToString(),
+                                    Side = execData[i]["side"].ToString() == "Buy" ? Side.BUY : Side.SELL,
+                                    Size = Convert.ToInt32(execData[i]["lastQty"]),
+                                    Price = Convert.ToDouble(execData[i]["lastPx"])
+                                });
+                            }
+                        }
+
+                        if (executions.Count > 0)
+                        {
+                            this.RaiseOnExecution(new DataFeedExecutionEventArgs()
+                            {
+                                Executions = executions.ToArray()
+                            });
+                        }
+                    }
+                }
+                else
+                {
+                    Log.Warn(e.Data);
+                }
             }
             else if (data["info"] != null)
             {
@@ -188,7 +246,7 @@ namespace AlphaTrade
             else
             {
                 // Unknown message, log it
-                Log.Debug(e.Data);
+                Log.Warn(e.Data);
             }
         }
 

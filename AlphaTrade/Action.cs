@@ -15,9 +15,11 @@ namespace AlphaTrade
             MODIFY_ORDER,
             CANCEL_ORDER,
             CANCEL_ALL_ORDERS,
+            UPDATE_ORDERS,
 
             CLOSE_POSITION,
-            CLOSE_ALL_POSITIONS
+            CLOSE_ALL_POSITIONS,
+            UPDATE_POSITIONS
         }
 
         public Types Type;

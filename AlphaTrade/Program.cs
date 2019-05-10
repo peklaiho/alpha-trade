@@ -22,7 +22,7 @@ namespace AlphaTrade
             IExchange exchange = new BitMEX(url, key, secret);
 
             string wsUrl = ConfigurationManager.AppSettings["bitmexWs"];
-            DataFeed feed = new BitMEXDataFeed(wsUrl);
+            DataFeed feed = new BitMEXDataFeed(wsUrl, key, secret);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

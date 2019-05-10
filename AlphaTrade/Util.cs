@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace AlphaTrade
 {
@@ -26,6 +28,37 @@ namespace AlphaTrade
             }
 
             return "unknown";
+        }
+
+        public static string BitmexSignature(string secret, string method, string endpoint, string expires, string postData)
+        {
+            string message = method + endpoint + expires + postData;
+            byte[] signatureBytes = hmacsha256(Encoding.UTF8.GetBytes(secret), Encoding.UTF8.GetBytes(message));
+            return ByteArrayToString(signatureBytes);
+        }
+
+        private static string ByteArrayToString(byte[] ba)
+        {
+            StringBuilder hex = new StringBuilder(ba.Length * 2);
+            foreach (byte b in ba)
+            {
+                hex.AppendFormat("{0:x2}", b);
+            }
+            return hex.ToString();
+        }
+
+        public static string BitmexExpires()
+        {
+            var exp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 86400; // set expires 1 day in the future
+            return exp.ToString();
+        }
+
+        private static byte[] hmacsha256(byte[] keyByte, byte[] messageBytes)
+        {
+            using (var hash = new HMACSHA256(keyByte))
+            {
+                return hash.ComputeHash(messageBytes);
+            }
         }
     }
 }

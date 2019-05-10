@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.IO;
-using System.Security.Cryptography;
 using Newtonsoft.Json.Linq;
 
 namespace AlphaTrade
@@ -186,31 +185,43 @@ namespace AlphaTrade
 
         public Position[] GetPositions()
         {
-            return new Position[]
+            var param = new Dictionary<string, string>();
+            param["filter"] = "{\"isOpen\": true}";
+
+            string rawData = Query("GET", "/position", param, true, false);
+            JArray data = JArray.Parse(rawData);
+
+            Position[] positions = new Position[data.Count];
+
+            for (int i = 0; i < data.Count; i++)
             {
-                new Position()
+                var pos = new Position()
                 {
-                    Symbol = "XBTUSD",
-                    Size = 12,
-                    Price = 5820.65
-                },
-                new Position()
-                {
-                    Symbol = "ETHUSD",
-                    Size = -8,
-                    Price = 5830.34
-                }
-            };
+                    Symbol = data[i]["symbol"].ToString(),
+                    Size = Convert.ToInt32(data[i]["currentQty"]),
+                    Price = Convert.ToDouble(data[i]["avgEntryPrice"]),
+                    Leverage = Convert.ToDouble(data[i]["leverage"])
+                };
+
+                positions[i] = pos;
+            }
+
+            return positions;
         }
 
         public void ClosePosition(string symbol)
         {
+            var param = new Dictionary<string, string>();
+            param["symbol"] = symbol;
+            param["ordType"] = "Market";
+            param["execInst"] = "Close";
 
+            Query("POST", "/order", param, true, true);
         }
 
         public void CloseAllPositions()
         {
-
+            // TODO
         }
 
         private OrderType parseType(string type)
@@ -256,21 +267,6 @@ namespace AlphaTrade
             return entries.ToString();
         }
 
-        public string ByteArrayToString(byte[] ba)
-        {
-            StringBuilder hex = new StringBuilder(ba.Length * 2);
-            foreach (byte b in ba)
-            {
-                hex.AppendFormat("{0:x2}", b);
-            }
-            return hex.ToString();
-        }
-
-        private long GetExpires()
-        {
-            return DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 86400; // set expires 1 day in the future
-        }
-
         private string formatCandleSize(CandleSize size)
         {
             switch (size)
@@ -291,20 +287,18 @@ namespace AlphaTrade
         private string Query(string method, string function, Dictionary<string, string> param = null, bool auth = false, bool json = false)
         {
             string paramData = json ? BuildJSON(param) : BuildQueryData(param);
-            string url = "/api/v1" + function + ((method == "GET" && paramData != "") ? "?" + paramData : "");
+            string endpoint = "/api/v1" + function + ((method == "GET" && paramData != "") ? "?" + paramData : "");
             string postData = (method != "GET") ? paramData : "";
 
-            Log.Debug(">> " + method + " " + url + " " + postData);
+            Log.Debug(">> " + method + " " + endpoint + " " + postData);
 
-            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(this.url + url);
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(this.url + endpoint);
             webRequest.Method = method;
 
             if (auth)
             {
-                string expires = GetExpires().ToString();
-                string message = method + url + expires + postData;
-                byte[] signatureBytes = hmacsha256(Encoding.UTF8.GetBytes(this.secret), Encoding.UTF8.GetBytes(message));
-                string signatureString = ByteArrayToString(signatureBytes);
+                string expires = Util.BitmexExpires();
+                string signatureString = Util.BitmexSignature(this.secret, method, endpoint, expires, postData);
 
                 webRequest.Headers.Add("api-expires", expires);
                 webRequest.Headers.Add("api-key", this.key);
@@ -329,14 +323,6 @@ namespace AlphaTrade
                     Log.Debug("<< " + response);
                     return response;
                 }
-            }
-        }
-
-        private byte[] hmacsha256(byte[] keyByte, byte[] messageBytes)
-        {
-            using (var hash = new HMACSHA256(keyByte))
-            {
-                return hash.ComputeHash(messageBytes);
             }
         }
     }

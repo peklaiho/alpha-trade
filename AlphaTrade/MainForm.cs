@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -14,7 +13,7 @@ namespace AlphaTrade
 
         private LogForm logForm;
 
-        private int lotSize = 10;
+        private int lotSize = 1;
         private double tickSize = 0.5;
         private double bidPrice = 0;
         private double askPrice = 0;
@@ -32,6 +31,8 @@ namespace AlphaTrade
             this.logForm = new LogForm();
             logForm.MdiParent = this;
             logForm.Show();
+
+            this.timer1.Start();
         }
 
         public void CreateOrder(Order order)
@@ -110,7 +111,8 @@ namespace AlphaTrade
                     queueAction(new Action(Action.Types.CANCEL_ALL_ORDERS));
                     return true;
                 case Keys.Control | Keys.Delete:
-                    queueAction(new Action(Action.Types.CLOSE_ALL_POSITIONS));
+                    // queueAction(new Action(Action.Types.CLOSE_ALL_POSITIONS));
+                    ClosePosition(symbol);
                     return true;
             }
 
@@ -254,6 +256,9 @@ namespace AlphaTrade
                         Log.Info("Cancel all orders!");
                         exchange.CancelAllOrders();
                         break;
+                    case Action.Types.UPDATE_ORDERS:
+                        action.Result = exchange.GetOrders();
+                        break;
 
                     // Positions
                     case Action.Types.CLOSE_POSITION:
@@ -262,6 +267,9 @@ namespace AlphaTrade
                     case Action.Types.CLOSE_ALL_POSITIONS:
                         Log.Info("Close all positions!");
                         exchange.CloseAllPositions();
+                        break;
+                    case Action.Types.UPDATE_POSITIONS:
+                        action.Result = exchange.GetPositions();
                         break;
 
                     // Windows
@@ -294,6 +302,18 @@ namespace AlphaTrade
         {
             Action action = (Action)e.Result;
 
+            if (action.Type == Action.Types.CREATE_ORDER ||
+                action.Type == Action.Types.MODIFY_ORDER ||
+                action.Type == Action.Types.CANCEL_ORDER ||
+                action.Type == Action.Types.CANCEL_ALL_ORDERS ||
+                action.Type == Action.Types.CLOSE_POSITION ||
+                action.Type == Action.Types.CLOSE_ALL_POSITIONS)
+            {
+                queueAction(new Action(Action.Types.UPDATE_POSITIONS));
+                queueAction(new Action(Action.Types.UPDATE_ORDERS));
+                return;
+            }
+
             if (action.Result != null && !(action.Result is Exception))
             { 
                 switch (action.Type)
@@ -322,6 +342,26 @@ namespace AlphaTrade
                         book.Show();
                         break;
 
+                    case Action.Types.UPDATE_ORDERS:
+                        foreach (var form in this.MdiChildren)
+                        {
+                            if (form is OrdersForm)
+                            {
+                                ((OrdersForm)form).UpdateOrders((Order[])action.Result);
+                            }
+                        }
+                        break;
+
+                    case Action.Types.UPDATE_POSITIONS:
+                        foreach (var form in this.MdiChildren)
+                        {
+                            if (form is PositionsForm)
+                            {
+                                ((PositionsForm)form).UpdatePositions((Position[])action.Result);
+                            }
+                        }
+                        break;
+
                     default:
                         Log.Error("Unhandled action result: " + action.Type);
                         break;
@@ -348,6 +388,11 @@ namespace AlphaTrade
                 this.dataFeed.OnOrderBook += (_, book) =>
                 {
                     worker.ReportProgress(2, book);
+                };
+
+                this.dataFeed.OnExecution += (_, execs) =>
+                {
+                    worker.ReportProgress(3, execs);
                 };
 
                 this.dataFeed.Start(this.symbol);
@@ -418,7 +463,23 @@ namespace AlphaTrade
                     }
                 }
             }
+            else if (e.ProgressPercentage == 3)
+            {
+                foreach (var exec in ((DataFeedExecutionEventArgs)e.UserState).Executions)
+                {
+                    Log.Info("Order filled: " + exec.ToString());
+                }
+
+                queueAction(new Action(Action.Types.UPDATE_POSITIONS));
+                queueAction(new Action(Action.Types.UPDATE_ORDERS));
+            }
         }
         #endregion
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            queueAction(new Action(Action.Types.UPDATE_POSITIONS));
+            queueAction(new Action(Action.Types.UPDATE_ORDERS));
+        }
     }
 }

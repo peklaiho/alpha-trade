@@ -7,6 +7,7 @@ namespace AlphaTrade
         public event EventHandler<DataFeedQuoteEventArgs> OnQuote;
         public event EventHandler<DataFeedTradeEventArgs> OnTrade;
         public event EventHandler<DataFeedOrderBookEventArgs> OnOrderBook;
+        public event EventHandler<DataFeedExecutionEventArgs> OnExecution;
 
         public void RaiseOnQuote(DataFeedQuoteEventArgs quote)
         {
@@ -21,6 +22,11 @@ namespace AlphaTrade
         public void RaiseOnOrderBook(DataFeedOrderBookEventArgs book)
         {
             OnOrderBook?.Invoke(this, book);
+        }
+
+        public void RaiseOnExecution(DataFeedExecutionEventArgs execs)
+        {
+            OnExecution?.Invoke(this, execs);
         }
 
         public abstract void Start(string symbol);

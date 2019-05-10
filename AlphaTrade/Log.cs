@@ -19,6 +19,7 @@ namespace AlphaTrade
         public static void Stream(string txt)
         {
             // raw network data
+            // record(new LogEntry() { Level = "S", Message = txt }, false);
         }
 
         public static void Debug(string txt)

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.menuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startDataFeedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,6 +48,7 @@
             this.backgroundWorkerDataFeed = new System.ComponentModel.BackgroundWorker();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabelInfo = new System.Windows.Forms.ToolStripStatusLabel();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -203,6 +205,11 @@
             this.toolStripStatusLabelInfo.Name = "toolStripStatusLabelInfo";
             this.toolStripStatusLabelInfo.Size = new System.Drawing.Size(0, 17);
             // 
+            // timer1
+            // 
+            this.timer1.Interval = 15000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -247,6 +254,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelInfo;
         private System.Windows.Forms.ToolStripMenuItem positionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ordersToolStripMenuItem;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

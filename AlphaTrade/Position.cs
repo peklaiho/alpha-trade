@@ -7,5 +7,6 @@ namespace AlphaTrade
         public string Symbol;
         public int Size;
         public double Price;
+        public double Leverage;
     }
 }
