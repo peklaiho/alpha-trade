@@ -6,8 +6,14 @@ namespace AlphaTrade
 {
     public partial class OrdersForm : Form
     {
-        public OrdersForm(Order[] orders)
+        private int lotSize;
+        private double tickSize;
+
+        public OrdersForm(Order[] orders, int lotSize, double tickSize)
         {
+            this.lotSize = lotSize;
+            this.tickSize = tickSize;
+
             InitializeComponent();
 
             UpdateOrders(orders);
@@ -19,11 +25,18 @@ namespace AlphaTrade
 
             foreach (var order in orders)
             {
+                string sizeStr = order.Size.ToString();
+                if (order.Unfilled < order.Size)
+                {
+                    var filled = order.Size - order.Unfilled;
+                    sizeStr = filled + " / " + order.Size;
+                }
+
                 this.dataGridView1.Rows.Add(
-                    order.Id,
+                    order,
                     order.Symbol,
                     order.TypeToString(),
-                    order.Size,
+                    sizeStr,
                     order.Price,
                     "Cancel"
                 );
@@ -34,13 +47,13 @@ namespace AlphaTrade
         {
             if (e.ColumnIndex == 2)
             {
-                var type = (string)this.dataGridView1.Rows[e.RowIndex].Cells[2].Value;
+                var order = (Order)this.dataGridView1.Rows[e.RowIndex].Cells[0].Value;
 
-                if (type.IndexOf("STOP") >= 0)
+                if (order.Type == OrderType.STOP)
                 {
                     e.CellStyle.ForeColor = Color.Blue;
                 }
-                else if (type.IndexOf("BUY") >= 0)
+                else if (order.Side == Side.BUY)
                 {
                     e.CellStyle.ForeColor = Color.ForestGreen;
                 }
@@ -53,11 +66,29 @@ namespace AlphaTrade
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+            if (e.RowIndex < 0)
+                return;
+
             if (e.ColumnIndex == 5)
             {
-                var id = (string)this.dataGridView1.Rows[e.RowIndex].Cells[0].Value;
+                var order = (Order)this.dataGridView1.Rows[e.RowIndex].Cells[0].Value;
 
-                ((MainForm)this.MdiParent).CancelOrder(id);
+                ((MainForm)this.MdiParent).CancelOrder(order);
+            }
+        }
+
+        private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex < 0)
+                return;
+
+            if (e.Button == MouseButtons.Right)
+            {
+                var order = (Order)this.dataGridView1.Rows[e.RowIndex].Cells[0].Value;
+                var form = new OrderEditForm(order, lotSize, tickSize);
+                form.Location = new Point(Location.X, Location.Y);
+                form.MdiParent = this.MdiParent;
+                form.Show();
             }
         }
     }

@@ -16,14 +16,14 @@ namespace AlphaTrade
             Info("Welcome to AlphaTrade. Lets make some money!");
         }
 
-        public static void Raw(string txt)
+        public static void Stream(string txt)
         {
             // raw network data
         }
 
         public static void Debug(string txt)
         {
-            record(new LogEntry() { Level = "D", Message = txt });
+            record(new LogEntry() { Level = "D", Message = txt }, false);
         }
 
         public static void Info(string txt)
@@ -41,9 +41,10 @@ namespace AlphaTrade
             record(new LogEntry() { Level = "E", Message = txt });
         }
 
-        private static void record(LogEntry entry)
+        private static void record(LogEntry entry, bool addEntry = true)
         {
-            Entries.Add(entry);
+            if (addEntry)
+                Entries.Add(entry);
 
             string time = entry.Time.ToString("yyyy-MM-dd HH:mm:ss");
             log.WriteLine(time + " :: " + entry.Level + " :: " + entry.Message);

@@ -73,6 +73,9 @@ namespace AlphaTrade
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+            if (e.RowIndex < 0)
+                return;
+
             if (e.ColumnIndex == 4)
             {
                 var symbol = (string)this.dataGridView1.Rows[e.RowIndex].Cells[0].Value;

@@ -64,7 +64,7 @@ namespace AlphaTrade
 
         private void Send(string query)
         {
-            Log.Raw(">> " + query);
+            Log.Stream(">> " + query);
 
             try
             {
@@ -78,7 +78,7 @@ namespace AlphaTrade
 
         private void Ws_OnMessage(object sender, MessageEventArgs e)
         {
-            Log.Raw("<< " + e.Data);
+            Log.Stream("<< " + e.Data);
 
             var data = JObject.Parse(e.Data);
 
@@ -183,7 +183,7 @@ namespace AlphaTrade
             }
             else if (data["success"] != null && data["subscribe"] != null)
             {
-                Log.Debug("Subscribed to stream: " + data["subscribe"].ToString());
+                Log.Info("Subscribed to stream: " + data["subscribe"].ToString());
             }
             else
             {

@@ -10,6 +10,7 @@ namespace AlphaTrade
         public OrderType Type;
         public double Price;
         public int Size;
+        public int Unfilled;
 
         public override string ToString()
         {

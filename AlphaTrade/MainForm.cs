@@ -40,16 +40,16 @@ namespace AlphaTrade
             queueAction(new Action(Action.Types.CREATE_ORDER, order));
         }
 
-        public void ModifyOrder(string id, int size, double price)
+        public void ModifyOrder(Order order)
         {
-            Log.Info("Modify order: " + id + " (size " + size + ", price " + price.ToString("f2") + ")");
-            queueAction(new Action(Action.Types.MODIFY_ORDER, (id, size, price)));
+            Log.Info("Modify order: " + order.ToString());
+            queueAction(new Action(Action.Types.MODIFY_ORDER, order));
         }
 
-        public void CancelOrder(string id)
+        public void CancelOrder(Order order)
         {
-            Log.Info("Cancel order: " + id);
-            queueAction(new Action(Action.Types.CANCEL_ORDER, id));
+            Log.Info("Cancel order: " + order.ToString());
+            queueAction(new Action(Action.Types.CANCEL_ORDER, order));
         }
 
         public void ClosePosition(string symbol)
@@ -128,6 +128,7 @@ namespace AlphaTrade
         private void hotkeyOrder(Side side, int lots, int relPrice)
         {
             var order = new Order() { Symbol = symbol, Side = side, Size = lotSize * lots, Type = OrderType.LIMIT };
+            order.Unfilled = order.Size;
 
             if (relPrice == 999)
             {
@@ -244,11 +245,23 @@ namespace AlphaTrade
                         exchange.CreateOrder((Order)action.Args);
                         break;
                     case Action.Types.MODIFY_ORDER:
-                        var args = ((string, int, double))action.Args;
-                        exchange.ModifyOrder(args.Item1, args.Item2, args.Item3);
+                        exchange.ModifyOrder((Order)action.Args);
                         break;
                     case Action.Types.CANCEL_ORDER:
-                        exchange.CancelOrder((string)action.Args);
+                        exchange.CancelOrder((Order)action.Args);
+                        break;
+                    case Action.Types.CANCEL_ALL_ORDERS:
+                        Log.Info("Cancel all orders!");
+                        exchange.CancelAllOrders();
+                        break;
+
+                    // Positions
+                    case Action.Types.CLOSE_POSITION:
+                        exchange.ClosePosition((string)action.Args);
+                        break;
+                    case Action.Types.CLOSE_ALL_POSITIONS:
+                        Log.Info("Close all positions!");
+                        exchange.CloseAllPositions();
                         break;
 
                     // Windows
@@ -272,6 +285,7 @@ namespace AlphaTrade
             }
             catch (Exception ex)
             {
+                Log.Error(ex.Message);
                 action.Result = ex;
             }
         }
@@ -280,12 +294,12 @@ namespace AlphaTrade
         {
             Action action = (Action)e.Result;
 
-            if (!(action.Result is Exception))
+            if (action.Result != null && !(action.Result is Exception))
             { 
                 switch (action.Type)
                 {
                     case Action.Types.WINDOW_ORDERS:
-                        var orders = new OrdersForm((Order[])action.Result);
+                        var orders = new OrdersForm((Order[])action.Result, lotSize, tickSize);
                         orders.MdiParent = this;
                         orders.Show();
                         break;
@@ -306,6 +320,10 @@ namespace AlphaTrade
                         var book = new OrderBookForm((OrderBook)action.Result, this.symbol);
                         book.MdiParent = this;
                         book.Show();
+                        break;
+
+                    default:
+                        Log.Error("Unhandled action result: " + action.Type);
                         break;
                 }
             }

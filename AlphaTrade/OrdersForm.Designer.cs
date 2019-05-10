@@ -33,7 +33,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.ColumnOrdId = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColumnOrdOrder = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnOrdSymbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnOrdType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnOrdSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -60,7 +60,7 @@
             this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ColumnOrdId,
+            this.ColumnOrdOrder,
             this.ColumnOrdSymbol,
             this.ColumnOrdType,
             this.ColumnOrdSize,
@@ -83,13 +83,14 @@
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             this.dataGridView1.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dataGridView1_CellFormatting);
+            this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
             // 
-            // ColumnOrdId
+            // ColumnOrdOrder
             // 
-            this.ColumnOrdId.HeaderText = "Id";
-            this.ColumnOrdId.Name = "ColumnOrdId";
-            this.ColumnOrdId.ReadOnly = true;
-            this.ColumnOrdId.Visible = false;
+            this.ColumnOrdOrder.HeaderText = "Order";
+            this.ColumnOrdOrder.Name = "ColumnOrdOrder";
+            this.ColumnOrdOrder.ReadOnly = true;
+            this.ColumnOrdOrder.Visible = false;
             // 
             // ColumnOrdSymbol
             // 
@@ -148,7 +149,7 @@
         #endregion
 
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnOrdId;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnOrdOrder;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnOrdSymbol;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnOrdType;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnOrdSize;

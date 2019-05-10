@@ -84,53 +84,104 @@ namespace AlphaTrade
             return bookData;
         }
 
-        public void CreateOrder(Order order)
-        {
-
-        }
-
-        public void ModifyOrder(string id, int size, double price)
-        {
-
-        }
-
-        public void CancelOrder(string id)
-        {
-
-        }
-
         public Order[] GetOrders()
         {
-            return new Order[]
+            var param = new Dictionary<string, string>();
+            param["filter"] = "{\"open\": true}";
+
+            string rawData = Query("GET", "/order", param, true, false);
+            JArray data = JArray.Parse(rawData);
+
+            Order[] orders = new Order[data.Count];
+
+            for (int i = 0; i < data.Count; i++)
             {
-                new Order()
+                JObject orderData = (JObject)data[i];
+
+                var order = new Order()
                 {
-                    Id = "abc123",
-                    Symbol = "XBTUSD",
-                    Side = Side.BUY,
-                    Type = OrderType.LIMIT,
-                    Price = 5799.50,
-                    Size = 12
-                },
-                new Order()
+                    Id = orderData["orderID"].ToString(),
+                    Symbol = orderData["symbol"].ToString(),
+                    Side = orderData["side"].ToString() == "Buy" ? Side.BUY : Side.SELL,
+                    Type = this.parseType(orderData["ordType"].ToString()),
+                    Size = Convert.ToInt32(orderData["orderQty"]),
+                    Unfilled = Convert.ToInt32(orderData["leavesQty"])
+                };
+
+                if (order.Type == OrderType.STOP)
                 {
-                    Id = "efg456",
-                    Symbol = "XBTUSD",
-                    Side = Side.SELL,
-                    Type = OrderType.MARKET,
-                    Price = 6112.00,
-                    Size = 8
-                },
-                new Order()
-                {
-                    Id = "ggg666",
-                    Symbol = "XBTUSD",
-                    Side = Side.SELL,
-                    Type = OrderType.STOP,
-                    Price = 6354.00,
-                    Size = 44
+                    order.Price = Convert.ToDouble(orderData["stopPx"]);
                 }
-            };
+                else if (order.Type == OrderType.LIMIT)
+                {
+                    order.Price = Convert.ToDouble(orderData["price"]);
+                }
+
+                orders[i] = order;
+            }
+
+            return orders;
+        }
+
+        public void CreateOrder(Order order)
+        {
+            var param = new Dictionary<string, string>();
+            param["symbol"] = order.Symbol;
+            param["side"] = order.Side == Side.BUY ? "Buy" : "Sell";
+            param["orderQty"] = order.Size.ToString();
+
+            if (order.Type == OrderType.STOP)
+            {
+                param["stopPx"] = order.Price.ToString("f2");
+                param["ordType"] = "Stop";
+            }
+            else
+            {
+                param["price"] = order.Price.ToString("f2");
+
+                if (order.Type == OrderType.LIMIT)
+                {
+                    param["ordType"] = "Limit";
+                }
+                else
+                {
+                    param["ordType"] = "Market";
+                }
+            }
+
+            string rawData = Query("POST", "/order", param, true, true);
+            JObject data = JObject.Parse(rawData);
+            order.Id = data["orderID"].ToString();
+        }
+
+        public void ModifyOrder(Order order)
+        {
+            var param = new Dictionary<string, string>();
+            param["orderID"] = order.Id;
+            param["orderQty"] = order.Size.ToString();
+
+            if (order.Type == OrderType.STOP)
+            {
+                param["stopPx"] = order.Price.ToString("f2");
+            }
+            else
+            {
+                param["price"] = order.Price.ToString("f2");
+            }
+
+            Query("PUT", "/order", param, true, true);
+        }
+
+        public void CancelOrder(Order order)
+        {
+            var param = new Dictionary<string, string>();
+            param["orderID"] = order.Id;
+            Query("DELETE", "/order", param, true, true);
+        }
+
+        public void CancelAllOrders()
+        {
+            Query("DELETE", "/order/all", null, true, false);
         }
 
         public Position[] GetPositions()
@@ -150,6 +201,30 @@ namespace AlphaTrade
                     Price = 5830.34
                 }
             };
+        }
+
+        public void ClosePosition(string symbol)
+        {
+
+        }
+
+        public void CloseAllPositions()
+        {
+
+        }
+
+        private OrderType parseType(string type)
+        {
+            if (type == "Stop")
+            {
+                return OrderType.STOP;
+            }
+            else if (type == "Limit")
+            {
+                return OrderType.LIMIT;
+            }
+
+            return OrderType.MARKET;
         }
 
         private string BuildQueryData(Dictionary<string, string> param)
@@ -193,7 +268,7 @@ namespace AlphaTrade
 
         private long GetExpires()
         {
-            return DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 300; // set expires 5 minutes in the future
+            return DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 86400; // set expires 1 day in the future
         }
 
         private string formatCandleSize(CandleSize size)
@@ -215,48 +290,45 @@ namespace AlphaTrade
 
         private string Query(string method, string function, Dictionary<string, string> param = null, bool auth = false, bool json = false)
         {
-            try
+            string paramData = json ? BuildJSON(param) : BuildQueryData(param);
+            string url = "/api/v1" + function + ((method == "GET" && paramData != "") ? "?" + paramData : "");
+            string postData = (method != "GET") ? paramData : "";
+
+            Log.Debug(">> " + method + " " + url + " " + postData);
+
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(this.url + url);
+            webRequest.Method = method;
+
+            if (auth)
             {
-                string paramData = json ? BuildJSON(param) : BuildQueryData(param);
-                string url = "/api/v1" + function + ((method == "GET" && paramData != "") ? "?" + paramData : "");
-                string postData = (method != "GET") ? paramData : "";
+                string expires = GetExpires().ToString();
+                string message = method + url + expires + postData;
+                byte[] signatureBytes = hmacsha256(Encoding.UTF8.GetBytes(this.secret), Encoding.UTF8.GetBytes(message));
+                string signatureString = ByteArrayToString(signatureBytes);
 
-                HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(this.url + url);
-                webRequest.Method = method;
+                webRequest.Headers.Add("api-expires", expires);
+                webRequest.Headers.Add("api-key", this.key);
+                webRequest.Headers.Add("api-signature", signatureString);
+            }
 
-                if (auth)
+            if (postData != "")
+            {
+                webRequest.ContentType = json ? "application/json" : "application/x-www-form-urlencoded";
+                var data = Encoding.UTF8.GetBytes(postData);
+                using (var stream = webRequest.GetRequestStream())
                 {
-                    string expires = GetExpires().ToString();
-                    string message = method + url + expires + postData;
-                    byte[] signatureBytes = hmacsha256(Encoding.UTF8.GetBytes(this.secret), Encoding.UTF8.GetBytes(message));
-                    string signatureString = ByteArrayToString(signatureBytes);
-
-                    webRequest.Headers.Add("api-expires", expires);
-                    webRequest.Headers.Add("api-key", this.key);
-                    webRequest.Headers.Add("api-signature", signatureString);
-                }
-
-                if (postData != "")
-                {
-                    webRequest.ContentType = json ? "application/json" : "application/x-www-form-urlencoded";
-                    var data = Encoding.UTF8.GetBytes(postData);
-                    using (var stream = webRequest.GetRequestStream())
-                    {
-                        stream.Write(data, 0, data.Length);
-                    }
-                }
-
-                using (WebResponse webResponse = webRequest.GetResponse())
-                using (Stream str = webResponse.GetResponseStream())
-                using (StreamReader sr = new StreamReader(str))
-                {
-                    return sr.ReadToEnd();
+                    stream.Write(data, 0, data.Length);
                 }
             }
-            catch (Exception ex)
+
+            using (WebResponse webResponse = webRequest.GetResponse())
             {
-                Log.Error(ex.Message);
-                throw;
+                using (StreamReader sr = new StreamReader(webResponse.GetResponseStream()))
+                {
+                    string response = sr.ReadToEnd();
+                    Log.Debug("<< " + response);
+                    return response;
+                }
             }
         }
 

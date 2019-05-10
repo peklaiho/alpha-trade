@@ -18,9 +18,9 @@ namespace AlphaTrade
             InitializeComponent();
 
             this.Text = symbol;
-            this.numericSize.Minimum = (decimal)lotSize;
-            this.numericSize.Increment = (decimal)lotSize;
-            this.numericPrice.Increment = (decimal) tickSize;
+            this.numericSize.Minimum = lotSize;
+            this.numericSize.Increment = lotSize;
+            this.numericPrice.Increment = (decimal)tickSize;
             this.comboType.SelectedIndex = 0;
 
             this.updateBidAsk();
@@ -58,14 +58,16 @@ namespace AlphaTrade
 
         private Order makeOrder(Side side)
         {
-            return new Order()
+            var order = new Order()
             {
                 Symbol = symbol,
                 Side = side,
                 Type = (OrderType)this.comboType.SelectedIndex,
                 Price = (double)this.numericPrice.Value,
-                Size = (int)this.numericSize.Value
+                Size = (int)this.numericSize.Value,
             };
+            order.Unfilled = order.Size;
+            return order;
         }
 
         private void labelBid_Click(object sender, EventArgs e)
