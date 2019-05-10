@@ -53,6 +53,20 @@ namespace AlphaTrade
             return exp.ToString();
         }
 
+        public static double PNLinUSD(int size, double entryPrice, double exitPrice)
+        {
+            if (size > 0)
+            {
+                // Long position
+                return Math.Abs(size) * ((1 / entryPrice) - (1 / exitPrice)) * Math.Max(entryPrice, exitPrice);
+            }
+            else
+            {
+                // Short position
+                return Math.Abs(size) * ((1 / exitPrice) - (1 / entryPrice)) * Math.Min(entryPrice, exitPrice);
+            }
+        }
+
         private static byte[] hmacsha256(byte[] keyByte, byte[] messageBytes)
         {
             using (var hash = new HMACSHA256(keyByte))

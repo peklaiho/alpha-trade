@@ -132,14 +132,14 @@ namespace AlphaTrade
             if (order.Type == OrderType.STOP)
             {
                 param["stopPx"] = order.Price.ToString("f2");
+                param["execInst"] = "LastPrice";
                 param["ordType"] = "Stop";
             }
             else
             {
-                param["price"] = order.Price.ToString("f2");
-
                 if (order.Type == OrderType.LIMIT)
                 {
+                    param["price"] = order.Price.ToString("f2");
                     param["ordType"] = "Limit";
                 }
                 else

@@ -13,7 +13,7 @@ namespace AlphaTrade
 
         private LogForm logForm;
 
-        private int lotSize = 1;
+        private int lotSize = 100;
         private double tickSize = 0.5;
         private double bidPrice = 0;
         private double askPrice = 0;

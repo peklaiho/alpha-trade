@@ -49,11 +49,19 @@ namespace AlphaTrade
         private void buttonBuy_Click(object sender, EventArgs e)
         {
             ((MainForm)this.MdiParent).CreateOrder(makeOrder(Side.BUY));
+
+            // Reset order type and size
+            this.comboType.SelectedIndex = 0;
+            this.numericSize.Value = this.numericSize.Minimum;
         }
 
         private void buttonSell_Click(object sender, EventArgs e)
         {
             ((MainForm)this.MdiParent).CreateOrder(makeOrder(Side.SELL));
+
+            // Reset order type and size
+            this.comboType.SelectedIndex = 0;
+            this.numericSize.Value = this.numericSize.Minimum;
         }
 
         private Order makeOrder(Side side)
