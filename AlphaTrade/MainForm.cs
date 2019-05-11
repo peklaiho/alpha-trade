@@ -177,6 +177,11 @@ namespace AlphaTrade
             }
         }
 
+        private void statsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            queueAction(new Action(Action.Types.STATS));
+        }
+
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -286,6 +291,10 @@ namespace AlphaTrade
                         action.Result = exchange.GetOrderBook(symbol);
                         break;
 
+                    case Action.Types.STATS:
+                        action.Result = exchange.GetExecutions();
+                        break;
+
                     default:
                         Log.Error("Unhandled action: " + action.Type);
                         break;
@@ -362,6 +371,11 @@ namespace AlphaTrade
                         }
                         break;
 
+                    case Action.Types.STATS:
+                        var executions = (Execution[])action.Result;
+                        Stats.LogStats((Execution[])action.Result);
+                        break;
+
                     default:
                         Log.Error("Unhandled action result: " + action.Type);
                         break;
@@ -373,32 +387,41 @@ namespace AlphaTrade
         {
             var worker = (BackgroundWorker)sender;
 
+            EventHandler<DataFeedQuoteEventArgs> handleOnQuote = (_, quote) =>
+            {
+                worker.ReportProgress(0, quote);
+            };
+
+            EventHandler<DataFeedTradeEventArgs> handleOnTrade = (_, trades) =>
+            {
+                worker.ReportProgress(1, trades);
+            };
+
+            EventHandler<DataFeedOrderBookEventArgs> handleOnOrderBook = (_, book) =>
+            {
+                worker.ReportProgress(2, book);
+            };
+
+            EventHandler<DataFeedExecutionEventArgs> handleOnExecution = (_, execs) =>
+            {
+                worker.ReportProgress(3, execs);
+            };
+
+            this.dataFeed.OnQuote += handleOnQuote;
+            this.dataFeed.OnTrade += handleOnTrade;
+            this.dataFeed.OnOrderBook += handleOnOrderBook;
+            this.dataFeed.OnExecution += handleOnExecution;
+
             try
             {
-                this.dataFeed.OnQuote += (_, quote) =>
-                {
-                    worker.ReportProgress(0, quote);
-                };
-
-                this.dataFeed.OnTrade += (_, trades) =>
-                {
-                    worker.ReportProgress(1, trades);
-                };
-
-                this.dataFeed.OnOrderBook += (_, book) =>
-                {
-                    worker.ReportProgress(2, book);
-                };
-
-                this.dataFeed.OnExecution += (_, execs) =>
-                {
-                    worker.ReportProgress(3, execs);
-                };
-
                 this.dataFeed.Start(this.symbol);
             }
             catch (Exception)
             {
+                this.dataFeed.OnQuote -= handleOnQuote;
+                this.dataFeed.OnTrade -= handleOnTrade;
+                this.dataFeed.OnOrderBook -= handleOnOrderBook;
+                this.dataFeed.OnExecution -= handleOnExecution;
                 return;
             }
 
@@ -406,6 +429,11 @@ namespace AlphaTrade
             {
                 Thread.Sleep(50);
             }
+
+            this.dataFeed.OnQuote -= handleOnQuote;
+            this.dataFeed.OnTrade -= handleOnTrade;
+            this.dataFeed.OnOrderBook -= handleOnOrderBook;
+            this.dataFeed.OnExecution -= handleOnExecution;
 
             this.dataFeed.Stop();
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Configuration;
 using System.Windows.Forms;
 
@@ -12,6 +13,8 @@ namespace AlphaTrade
         [STAThread]
         static void Main()
         {
+            ServicePointManager.DefaultConnectionLimit = 5;
+
             string logFile = ConfigurationManager.AppSettings["logFile"];
             Log.Init(logFile);
 

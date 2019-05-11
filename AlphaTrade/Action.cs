@@ -19,7 +19,9 @@ namespace AlphaTrade
 
             CLOSE_POSITION,
             CLOSE_ALL_POSITIONS,
-            UPDATE_POSITIONS
+            UPDATE_POSITIONS,
+
+            STATS
         }
 
         public Types Type;

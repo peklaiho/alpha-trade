@@ -16,10 +16,10 @@ namespace AlphaTrade
             Info("Welcome to AlphaTrade. Lets make some money!");
         }
 
-        public static void Stream(string txt)
+        public static void Network(string txt)
         {
             // raw network data
-            // record(new LogEntry() { Level = "S", Message = txt }, false);
+            // record(new LogEntry() { Level = "N", Message = txt }, false);
         }
 
         public static void Debug(string txt)

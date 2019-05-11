@@ -49,6 +49,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabelInfo = new System.Windows.Forms.ToolStripStatusLabel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.statsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -69,6 +70,7 @@
             this.menuToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.startDataFeedToolStripMenuItem,
             this.stopDataFeedToolStripMenuItem,
+            this.statsToolStripMenuItem,
             this.closeToolStripMenuItem});
             this.menuToolStripMenuItem.Name = "menuToolStripMenuItem";
             this.menuToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
@@ -77,21 +79,21 @@
             // startDataFeedToolStripMenuItem
             // 
             this.startDataFeedToolStripMenuItem.Name = "startDataFeedToolStripMenuItem";
-            this.startDataFeedToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.startDataFeedToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.startDataFeedToolStripMenuItem.Text = "Start Data Feed";
             this.startDataFeedToolStripMenuItem.Click += new System.EventHandler(this.startDataFeedToolStripMenuItem_Click);
             // 
             // stopDataFeedToolStripMenuItem
             // 
             this.stopDataFeedToolStripMenuItem.Name = "stopDataFeedToolStripMenuItem";
-            this.stopDataFeedToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.stopDataFeedToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.stopDataFeedToolStripMenuItem.Text = "Stop Data Feed";
             this.stopDataFeedToolStripMenuItem.Click += new System.EventHandler(this.stopDataFeedToolStripMenuItem_Click);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.closeToolStripMenuItem.Text = "Exit";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
@@ -116,7 +118,7 @@
             this.minToolStripMenuItem,
             this.minToolStripMenuItem1});
             this.chartToolStripMenuItem.Name = "chartToolStripMenuItem";
-            this.chartToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.chartToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.chartToolStripMenuItem.Text = "Chart";
             // 
             // dailyToolStripMenuItem
@@ -150,35 +152,35 @@
             // orderBookToolStripMenuItem
             // 
             this.orderBookToolStripMenuItem.Name = "orderBookToolStripMenuItem";
-            this.orderBookToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.orderBookToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.orderBookToolStripMenuItem.Text = "Order Book";
             this.orderBookToolStripMenuItem.Click += new System.EventHandler(this.orderBookToolStripMenuItem_Click);
             // 
             // orderEntryToolStripMenuItem
             // 
             this.orderEntryToolStripMenuItem.Name = "orderEntryToolStripMenuItem";
-            this.orderEntryToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.orderEntryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.orderEntryToolStripMenuItem.Text = "Order Entry";
             this.orderEntryToolStripMenuItem.Click += new System.EventHandler(this.orderEntryToolStripMenuItem_Click);
             // 
             // positionsToolStripMenuItem
             // 
             this.positionsToolStripMenuItem.Name = "positionsToolStripMenuItem";
-            this.positionsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.positionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.positionsToolStripMenuItem.Text = "Positions";
             this.positionsToolStripMenuItem.Click += new System.EventHandler(this.positionsToolStripMenuItem_Click);
             // 
             // ordersToolStripMenuItem
             // 
             this.ordersToolStripMenuItem.Name = "ordersToolStripMenuItem";
-            this.ordersToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.ordersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.ordersToolStripMenuItem.Text = "Orders";
             this.ordersToolStripMenuItem.Click += new System.EventHandler(this.ordersToolStripMenuItem_Click);
             // 
             // tradesToolStripMenuItem
             // 
             this.tradesToolStripMenuItem.Name = "tradesToolStripMenuItem";
-            this.tradesToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.tradesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.tradesToolStripMenuItem.Text = "Trades";
             this.tradesToolStripMenuItem.Click += new System.EventHandler(this.tradesToolStripMenuItem_Click);
             // 
@@ -209,6 +211,13 @@
             // 
             this.timer1.Interval = 15000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // statsToolStripMenuItem
+            // 
+            this.statsToolStripMenuItem.Name = "statsToolStripMenuItem";
+            this.statsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.statsToolStripMenuItem.Text = "Stats";
+            this.statsToolStripMenuItem.Click += new System.EventHandler(this.statsToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -255,6 +264,7 @@
         private System.Windows.Forms.ToolStripMenuItem positionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ordersToolStripMenuItem;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.ToolStripMenuItem statsToolStripMenuItem;
     }
 }
 

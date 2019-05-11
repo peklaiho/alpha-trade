@@ -76,6 +76,7 @@
     <Compile Include="ChartForm.Designer.cs">
       <DependentUpon>ChartForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Currency.cs" />
     <Compile Include="DataFeed.cs" />
     <Compile Include="DataFeedExecutionEventArgs.cs" />
     <Compile Include="DataFeedOrderBookEventArgs.cs" />
@@ -95,6 +96,8 @@
     <Compile Include="Position.cs" />
     <Compile Include="Quote.cs" />
     <Compile Include="DataFeedQuoteEventArgs.cs" />
+    <Compile Include="Stats.cs" />
+    <Compile Include="StatsTrade.cs" />
     <Compile Include="Trade.cs" />
     <Compile Include="DataFeedTradeEventArgs.cs" />
     <Compile Include="IExchange.cs" />

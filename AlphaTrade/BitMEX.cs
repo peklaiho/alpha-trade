@@ -77,7 +77,7 @@ namespace AlphaTrade
                     Side = entryData["side"].ToString() == "Buy" ? Side.BUY : Side.SELL
                 };
 
-                bookData.Insert(entry);
+                bookData.InsertOrUpdate(entry);
             }
 
             return bookData;
@@ -224,6 +224,37 @@ namespace AlphaTrade
             // TODO
         }
 
+        public Execution[] GetExecutions()
+        {
+            var param = new Dictionary<string, string>();
+            param["filter"] = "{\"timestamp.date\": \"" + DateTime.Now.ToString("yyyy-MM-dd") + "\"}";
+            param["count"] = "500";
+
+            string rawData = Query("GET", "/execution/tradeHistory", param, true, false);
+            JArray data = JArray.Parse(rawData);
+
+            List<Execution> executions = new List<Execution>();
+
+            for (int i = 0; i < data.Count; i++)
+            {
+                if (data[i]["ordStatus"].ToString() == "Filled" || data[i]["ordStatus"].ToString() == "PartiallyFilled")
+                {
+                    executions.Add(new Execution()
+                    {
+                        OrderId = data[i]["orderID"].ToString(),
+                        Symbol = data[i]["symbol"].ToString(),
+                        Side = data[i]["side"].ToString() == "Buy" ? Side.BUY : Side.SELL,
+                        Size = Convert.ToInt32(data[i]["lastQty"]),
+                        Price = Convert.ToDouble(data[i]["lastPx"]),
+                        ValueSt = Math.Abs(Convert.ToInt64(data[i]["execCost"])),
+                        FeeSt = Convert.ToInt64(data[i]["execComm"])
+                    });
+                }
+            }
+
+            return executions.ToArray();
+        }
+
         private OrderType parseType(string type)
         {
             if (type == "Stop")
@@ -294,6 +325,7 @@ namespace AlphaTrade
 
             HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(this.url + endpoint);
             webRequest.Method = method;
+            webRequest.KeepAlive = true;
 
             if (auth)
             {

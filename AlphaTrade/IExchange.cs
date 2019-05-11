@@ -14,5 +14,7 @@
         Position[] GetPositions();
         void ClosePosition(string symbol);
         void CloseAllPositions();
+
+        Execution[] GetExecutions();
     }
 }

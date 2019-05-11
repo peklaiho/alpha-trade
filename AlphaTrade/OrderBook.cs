@@ -75,24 +75,28 @@ namespace AlphaTrade
             this.idList.Remove(id);
         }
 
-        public void Update(long id, int size, Side side)
-        {
-            this.book[id].Size = size;
-            this.book[id].Side = side;
-        }
-
-        public void Insert(OrderBookEntry entry)
+        public void InsertOrUpdate(OrderBookEntry entry)
         {
             if (this.book.ContainsKey(entry.Id))
             {
-                this.Update(entry.Id, entry.Size, entry.Side);
-                return;
+                // update old entry
+                this.book[entry.Id].Size = entry.Size;
+                this.book[entry.Id].Side = entry.Side;
             }
-
-            this.book.Add(entry.Id, entry);
-
-            this.idList.Add(entry.Id);
-            this.idList.Sort();
+            else
+            {
+                // new entry
+                if (entry.Price > 0)
+                {
+                    this.book[entry.Id] = entry;
+                    this.idList.Add(entry.Id);
+                    this.idList.Sort();
+                }
+                else
+                {
+                    Log.Warn("Update to order book with missing price.");
+                }
+            }
         }
     }
 }

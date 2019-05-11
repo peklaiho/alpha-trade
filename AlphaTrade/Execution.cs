@@ -10,6 +10,9 @@ namespace AlphaTrade
         public int Size;
         public double Price;
 
+        public long ValueSt;
+        public long FeeSt;
+
         public override string ToString()
         {
             return ((Side == Side.BUY) ? "Buy " : "Sell ") +

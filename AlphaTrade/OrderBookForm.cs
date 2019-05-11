@@ -34,13 +34,9 @@ namespace AlphaTrade
                     {
                         this.data.Delete(entry.Id);
                     }
-                    else if (e.Type == DataFeedOrderBookEventArgs.Types.Insert)
-                    {
-                        this.data.Insert(entry);
-                    }
                     else
                     {
-                        this.data.Update(entry.Id, entry.Size, entry.Side);
+                        this.data.InsertOrUpdate(entry);
                     }
                 }
             }
