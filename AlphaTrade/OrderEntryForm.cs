@@ -5,15 +5,15 @@ namespace AlphaTrade
 {
     public partial class OrderEntryForm : Form
     {
+        public bool CloseOnEntry { get; set; }
+
         private string symbol;
         private double bidPrice;
         private double askPrice;
 
-        public OrderEntryForm(string symbol, int lotSize, double tickSize, double bid, double ask)
+        public OrderEntryForm(string symbol, int lotSize, double tickSize)
         {
             this.symbol = symbol;
-            this.bidPrice = bid;
-            this.askPrice = ask;
 
             InitializeComponent();
 
@@ -21,9 +21,69 @@ namespace AlphaTrade
             this.numericSize.Minimum = lotSize;
             this.numericSize.Increment = lotSize;
             this.numericPrice.Increment = (decimal)tickSize;
-            this.comboType.SelectedIndex = 0;
+            OrderType = OrderType.LIMIT;
 
             this.updateBidAsk();
+        }
+
+        public OrderType OrderType
+        {
+            get
+            {
+                return (OrderType)this.comboType.SelectedIndex;
+            }
+            set
+            {
+                this.comboType.SelectedIndex = (int)value;
+            }
+        }
+
+        public int OrderSize
+        {
+            get
+            {
+                return (int)this.numericSize.Value;
+            }
+            set
+            {
+                this.numericSize.Value = (int)value;
+            }
+        }
+
+        public double OrderPrice
+        {
+            get
+            {
+                return (double)this.numericPrice.Value;
+            }
+            set
+            {
+                this.numericPrice.Value = (decimal)value;
+            }
+        }
+
+        public bool BuyEnabled
+        {
+            get
+            {
+                return this.buttonBuy.Enabled;
+            }
+            set
+            {
+                this.buttonBuy.Enabled = value;
+            }
+        }
+
+        public bool SellEnabled
+        {
+            get
+            {
+                return this.buttonSell.Enabled;
+            }
+            set
+            {
+                this.buttonSell.Enabled = value;
+            }
         }
 
         public void UpdateQuotes(DataFeedQuoteEventArgs quotes)
@@ -46,22 +106,30 @@ namespace AlphaTrade
             this.labelAsk.Text = this.askPrice.ToString("f2");
         }
 
+        private void afterEntry()
+        {
+            if (CloseOnEntry)
+            {
+                this.Close();
+            }
+            else
+            {
+                // Reset order type and size
+                OrderType = OrderType.LIMIT;
+                this.numericSize.Value = this.numericSize.Minimum;
+            }
+        }
+
         private void buttonBuy_Click(object sender, EventArgs e)
         {
             ((MainForm)this.MdiParent).CreateOrder(makeOrder(Side.BUY));
-
-            // Reset order type and size
-            this.comboType.SelectedIndex = 0;
-            this.numericSize.Value = this.numericSize.Minimum;
+            afterEntry();
         }
 
         private void buttonSell_Click(object sender, EventArgs e)
         {
             ((MainForm)this.MdiParent).CreateOrder(makeOrder(Side.SELL));
-
-            // Reset order type and size
-            this.comboType.SelectedIndex = 0;
-            this.numericSize.Value = this.numericSize.Minimum;
+            afterEntry();
         }
 
         private Order makeOrder(Side side)

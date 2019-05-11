@@ -81,6 +81,7 @@
     <Compile Include="DataFeedExecutionEventArgs.cs" />
     <Compile Include="DataFeedOrderBookEventArgs.cs" />
     <Compile Include="Execution.cs" />
+    <Compile Include="Filesystem.cs" />
     <Compile Include="OrderEditForm.cs">
       <SubType>Form</SubType>
     </Compile>

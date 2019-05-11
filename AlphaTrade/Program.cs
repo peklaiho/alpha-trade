@@ -15,8 +15,7 @@ namespace AlphaTrade
         {
             ServicePointManager.DefaultConnectionLimit = 5;
 
-            string logFile = ConfigurationManager.AppSettings["logFile"];
-            Log.Init(logFile);
+            Log.Init();
 
             string url = ConfigurationManager.AppSettings["bitmexUrl"];
             string key = ConfigurationManager.AppSettings["bitmexKey"];

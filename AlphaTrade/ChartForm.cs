@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace AlphaTrade
 {
@@ -7,40 +9,25 @@ namespace AlphaTrade
     {
         private ChartData data;
         private string symbol;
-        private int shownCandles = 100;
+        private int lotSize;
+        private double tickSize;
 
-        public ChartForm(ChartData data, string symbol)
+        private int shownCandles = 100;
+        private Position currentPosition = null;
+
+        public ChartForm(ChartData data, string symbol, int lotSize, double tickSize)
         {
             this.data = data;
             this.symbol = symbol;
+            this.lotSize = lotSize;
+            this.tickSize = tickSize;
 
             InitializeComponent();
 
-            this.Text = symbol + " (" + Util.CandleSizeToString(data.GetCandleSize()) + ")";
-
             this.chart1.MouseWheel += Chart1_MouseWheel;
 
+            this.updateTitle();
             this.updateChart();
-        }
-
-        private void Chart1_MouseWheel(object sender, MouseEventArgs e)
-        {
-            if (e.Delta > 0)
-            {
-                if (shownCandles < 300)
-                {
-                    shownCandles += 10;
-                    updateChart();
-                }
-            }
-            else if (e.Delta < 0)
-            {
-                if (shownCandles > 30)
-                {
-                    shownCandles -= 10;
-                    updateChart();
-                }
-            }
         }
 
         public void UpdateTrades(DataFeedTradeEventArgs e)
@@ -54,6 +41,25 @@ namespace AlphaTrade
             }
 
             this.updateChart();
+        }
+
+        public void UpdatePositions(Position[] positions)
+        {
+            currentPosition = null;
+
+            foreach (var pos in positions)
+            {
+                if (pos.Symbol == symbol)
+                {
+                    currentPosition = pos;
+                    break;
+                }
+            }
+        }
+
+        private void updateTitle()
+        {
+            this.Text = symbol + " (" + Util.CandleSizeToString(data.GetCandleSize()) + ")";
         }
 
         private void updateChart()
@@ -127,9 +133,83 @@ namespace AlphaTrade
                 case CandleSize.HOUR_1:
                     return 50;
                 case CandleSize.MIN_1:
-                    return 5;
-                default:
                     return 10;
+                default:
+                    return 20;
+            }
+        }
+
+        private void Chart1_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                if (shownCandles < 300)
+                {
+                    shownCandles += 10;
+                    updateChart();
+                }
+            }
+            else if (e.Delta < 0)
+            {
+                if (shownCandles > 30)
+                {
+                    shownCandles -= 10;
+                    updateChart();
+                }
+            }
+        }
+
+        private void chart1_MouseMove(object sender, MouseEventArgs e)
+        {
+            var result = chart1.HitTest(e.X, e.Y);
+
+            if (result.PointIndex >= 0)
+            {
+                var high = this.chart1.Series["Price"].Points[result.PointIndex].YValues[0];
+                var low = this.chart1.Series["Price"].Points[result.PointIndex].YValues[1];
+                var open = this.chart1.Series["Price"].Points[result.PointIndex].YValues[2];
+                var close = this.chart1.Series["Price"].Points[result.PointIndex].YValues[3];
+
+                this.labelPrice.Text = String.Format("Open: {0:F2}  High: {1:F2}  Low:  {2:F2}  Close: {3:F2}", open, high, low, close);
+            }
+        }
+
+        private void chart1_MouseLeave(object sender, EventArgs e)
+        {
+            this.labelPrice.Text = "";
+        }
+
+        private void chart1_MouseClick(object sender, MouseEventArgs e)
+        {
+            var result = chart1.HitTest(e.X, e.Y);
+
+            if (result.PointIndex >= 0 && currentPosition != null)
+            {
+                var high = this.chart1.Series["Price"].Points[result.PointIndex].YValues[0];
+                var low = this.chart1.Series["Price"].Points[result.PointIndex].YValues[1];
+
+                var form = new OrderEntryForm(symbol, lotSize, tickSize);
+                form.StartPosition = FormStartPosition.Manual;
+                form.Location = new Point(Location.X + e.X, Location.Y + e.Y);
+                form.MdiParent = this.MdiParent;
+                form.CloseOnEntry = true;
+                form.OrderType = OrderType.STOP;
+                form.OrderSize = Math.Abs(currentPosition.Size);
+
+                if (currentPosition.Size > 0)
+                {
+                    // we are long, place a stop sell one tick below low of this candle
+                    form.OrderPrice = low - tickSize;
+                    form.BuyEnabled = false;
+                }
+                else
+                {
+                    // we are short, place a stop buy one tick above high of this candle
+                    form.OrderPrice = high + tickSize;
+                    form.SellEnabled = false;
+                }
+
+                form.Show();
             }
         }
     }

@@ -141,6 +141,7 @@ namespace AlphaTrade
                 {
                     param["price"] = order.Price.ToString("f2");
                     param["ordType"] = "Limit";
+                    param["execInst"] = "ParticipateDoNotInitiate";
                 }
                 else
                 {
@@ -151,6 +152,8 @@ namespace AlphaTrade
             string rawData = Query("POST", "/order", param, true, true);
             JObject data = JObject.Parse(rawData);
             order.Id = data["orderID"].ToString();
+
+            Log.Info("Order entry: " + data["ordStatus"].ToString());
         }
 
         public void ModifyOrder(Order order)
@@ -321,7 +324,7 @@ namespace AlphaTrade
             string endpoint = "/api/v1" + function + ((method == "GET" && paramData != "") ? "?" + paramData : "");
             string postData = (method != "GET") ? paramData : "";
 
-            Log.Debug(">> " + method + " " + endpoint + " " + postData);
+            Log.Network(">> " + method + " " + endpoint + " " + postData);
 
             HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(this.url + endpoint);
             webRequest.Method = method;
@@ -352,7 +355,7 @@ namespace AlphaTrade
                 using (StreamReader sr = new StreamReader(webResponse.GetResponseStream()))
                 {
                     string response = sr.ReadToEnd();
-                    Log.Debug("<< " + response);
+                    Log.Network("<< " + response);
                     return response;
                 }
             }

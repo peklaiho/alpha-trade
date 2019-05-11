@@ -87,7 +87,7 @@ namespace AlphaTrade
 
         private void Send(string query)
         {
-            Log.Network(">> " + query);
+            // Log.Network(">> " + query);
 
             try
             {
@@ -101,7 +101,7 @@ namespace AlphaTrade
 
         private void Ws_OnMessage(object sender, MessageEventArgs e)
         {
-            Log.Network("<< " + e.Data);
+            // Log.Network("<< " + e.Data);
 
             var data = JObject.Parse(e.Data);
 

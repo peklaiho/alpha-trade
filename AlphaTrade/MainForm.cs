@@ -13,7 +13,7 @@ namespace AlphaTrade
 
         private LogForm logForm;
 
-        private int lotSize = 100;
+        private int lotSize = 200;
         private double tickSize = 0.5;
         private double bidPrice = 0;
         private double askPrice = 0;
@@ -224,7 +224,7 @@ namespace AlphaTrade
 
         private void orderEntryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = new OrderEntryForm(this.symbol, this.lotSize, this.tickSize, this.bidPrice, this.askPrice);
+            var form = new OrderEntryForm(this.symbol, this.lotSize, this.tickSize);
             form.MdiParent = this;
             form.Show();
         }
@@ -340,7 +340,7 @@ namespace AlphaTrade
                         break;
 
                     case Action.Types.WINDOW_CHART:
-                        var chart = new ChartForm((ChartData)action.Result, this.symbol);
+                        var chart = new ChartForm((ChartData)action.Result, this.symbol, lotSize, tickSize);
                         chart.MdiParent = this;
                         chart.Show();
                         break;
@@ -367,6 +367,10 @@ namespace AlphaTrade
                             if (form is PositionsForm)
                             {
                                 ((PositionsForm)form).UpdatePositions((Position[])action.Result);
+                            }
+                            else if (form is ChartForm)
+                            {
+                                ((ChartForm)form).UpdatePositions((Position[])action.Result);
                             }
                         }
                         break;

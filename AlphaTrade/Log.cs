@@ -10,16 +10,16 @@ namespace AlphaTrade
 
         private static StreamWriter log;
 
-        public static void Init(string file)
+        public static void Init()
         {
+            string file = Filesystem.GetLogFile();
             log = new StreamWriter(file, true);
             Info("Welcome to AlphaTrade. Lets make some money!");
         }
 
         public static void Network(string txt)
         {
-            // raw network data
-            // record(new LogEntry() { Level = "N", Message = txt }, false);
+            record(new LogEntry() { Level = "N", Message = txt }, false);
         }
 
         public static void Debug(string txt)
