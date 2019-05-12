@@ -115,8 +115,8 @@ namespace AlphaTrade
             else
             {
                 // Reset order type and size
-                OrderType = OrderType.LIMIT;
-                this.numericSize.Value = this.numericSize.Minimum;
+                // OrderType = OrderType.LIMIT;
+                // this.numericSize.Value = this.numericSize.Minimum;
             }
         }
 
