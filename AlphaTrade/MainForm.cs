@@ -10,19 +10,20 @@ namespace AlphaTrade
         private IExchange exchange;
         private DataFeed dataFeed;
         private string symbol;
+        private int lotSize;
 
         private LogForm logForm;
 
-        private int lotSize = 200;
         private double tickSize = 0.5;
         private double bidPrice = 0;
         private double askPrice = 0;
 
-        public MainForm(IExchange exchange, DataFeed dataFeed, string symbol)
+        public MainForm(IExchange exchange, DataFeed dataFeed, string symbol, int lotSize)
         {
             this.exchange = exchange;
             this.dataFeed = dataFeed;
             this.symbol = symbol;
+            this.lotSize = lotSize;
 
             InitializeComponent();
             updateStatusStrip();

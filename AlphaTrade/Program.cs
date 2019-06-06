@@ -21,6 +21,7 @@ namespace AlphaTrade
             string key = ConfigurationManager.AppSettings["bitmexKey"];
             string secret = ConfigurationManager.AppSettings["bitmexSecret"];
             string symbol = ConfigurationManager.AppSettings["symbol"];
+            int lotSize = Convert.ToInt32(ConfigurationManager.AppSettings["lotSize"]);
             IExchange exchange = new BitMEX(url, key, secret);
 
             string wsUrl = ConfigurationManager.AppSettings["bitmexWs"];
@@ -28,7 +29,7 @@ namespace AlphaTrade
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm(exchange, feed, symbol));
+            Application.Run(new MainForm(exchange, feed, symbol, lotSize));
         }
     }
 }

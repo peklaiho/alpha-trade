@@ -5,6 +5,7 @@
   </startup>
   <appSettings>
     <add key="symbol" value="XBTUSD" />
+    <add key="lotSize" value="200" />
     <add key="bitmexUrl" value="https://www.bitmex.com" />
     <add key="bitmexWs" value="wss://www.bitmex.com" />
     <add key="bitmexKey" value="" />
