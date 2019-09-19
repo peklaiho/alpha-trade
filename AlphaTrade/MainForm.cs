@@ -25,6 +25,11 @@ namespace AlphaTrade
             this.symbol = symbol;
             this.lotSize = lotSize;
 
+            if (this.symbol == "ETHUSD")
+            {
+                tickSize = 0.05;
+            }
+
             InitializeComponent();
             updateStatusStrip();
 

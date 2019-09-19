@@ -79,7 +79,7 @@ namespace AlphaTrade
             ma20.Clear();
             ma8.Clear();
 
-            int min = 0, max = 0;
+            double min = 0, max = 0;
 
             for (int i = candles.Count - shownCandles; i < candles.Count; i++)
             {
@@ -102,20 +102,29 @@ namespace AlphaTrade
                 // Record min/max
                 if (min == 0 || candle.Low < min)
                 {
-                    min = (int)candle.Low;
+                    min = candle.Low;
                 }
                 if (max == 0 || candle.High > max)
                 {
-                    max = (int)candle.High;
+                    max = candle.High;
                 }
             }
 
             // Set min/max for y-axis
-            int interval = this.chartInterval();
-            min = min - 3;
-            max = max + 3;
-            while (min % interval != 0) min--;
-            while (max % interval != 0) max++;
+            double interval = this.chartInterval();
+
+            double buffer = 3;
+            if (this.symbol == "ETHUSD")
+            {
+                buffer = 0.25;
+            }
+
+            min = min - buffer;
+            max = max + buffer;
+
+            min -= min % interval;
+            max += interval - (max % interval);
+
             this.chart1.ChartAreas[0].AxisY2.Minimum = min;
             this.chart1.ChartAreas[0].AxisY2.Maximum = max;
             this.chart1.ChartAreas[0].AxisY2.Interval = interval;
@@ -124,18 +133,38 @@ namespace AlphaTrade
             this.chart1.Update();
         }
 
-        private int chartInterval()
+        private double chartInterval()
         {
-            switch (this.data.GetCandleSize())
+            switch (this.symbol)
             {
-                case CandleSize.DAY_1:
-                    return 200;
-                case CandleSize.HOUR_1:
-                    return 50;
-                case CandleSize.MIN_1:
-                    return 10;
+                case "XBTUSD":
+                    switch (this.data.GetCandleSize())
+                    {
+                        case CandleSize.DAY_1:
+                            return 200;
+                        case CandleSize.HOUR_1:
+                            return 50;
+                        case CandleSize.MIN_1:
+                            return 10;
+                        default:
+                            return 20;
+                    }
+
+                case "ETHUSD":
+                    switch (this.data.GetCandleSize())
+                    {
+                        case CandleSize.DAY_1:
+                            return 10;
+                        case CandleSize.HOUR_1:
+                            return 2.5;
+                        case CandleSize.MIN_1:
+                            return 0.25;
+                        default:
+                            return 0.5;
+                    }
+
                 default:
-                    return 20;
+                    return 10;
             }
         }
 
