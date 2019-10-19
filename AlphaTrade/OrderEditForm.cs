@@ -13,7 +13,6 @@ namespace AlphaTrade
 
             InitializeComponent();
 
-            this.numericSize.Minimum = lotSize;
             this.numericSize.Increment = lotSize;
             this.numericPrice.Increment = (decimal)tickSize;
 
