@@ -17,6 +17,7 @@ namespace AlphaTrade
         private double tickSize = 0.5;
         private double bidPrice = 0;
         private double askPrice = 0;
+        private int hotkeyLots = 1;
 
         public MainForm(IExchange exchange, DataFeed dataFeed, string symbol, int lotSize)
         {
@@ -67,9 +68,10 @@ namespace AlphaTrade
 
         private void updateStatusStrip()
         {
-            this.toolStripStatusLabelInfo.Text = 
+            this.toolStripStatusLabelInfo.Text =
                 "Bid: " + bidPrice.ToString("f2") +
-                "  Ask: " + askPrice.ToString("f2");
+                "  Ask: " + askPrice.ToString("f2") +
+                "  Size: " + (hotkeyLots * lotSize);
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -78,38 +80,54 @@ namespace AlphaTrade
             {
                 // Market orders
                 case Keys.Control | Keys.Up:
-                    hotkeyOrder(Side.BUY, 1, 999);
+                    hotkeyOrder(Side.BUY, 999);
                     return true;
                 case Keys.Control | Keys.Down:
-                    hotkeyOrder(Side.SELL, 1, 999);
+                    hotkeyOrder(Side.SELL, 999);
                     return true;
 
                 // Limit buys
                 case Keys.Control | Keys.Add:
-                    hotkeyOrder(Side.BUY, 1, 0);
+                    hotkeyOrder(Side.BUY, 0);
                     return true;
                 case Keys.Control | Keys.NumPad1:
-                    hotkeyOrder(Side.BUY, 1, -1);
+                    hotkeyOrder(Side.BUY, -1);
                     return true;
                 case Keys.Control | Keys.NumPad2:
-                    hotkeyOrder(Side.BUY, 1, -2);
+                    hotkeyOrder(Side.BUY, -2);
                     return true;
                 case Keys.Control | Keys.NumPad3:
-                    hotkeyOrder(Side.BUY, 1, -3);
+                    hotkeyOrder(Side.BUY, -3);
                     return true;
 
                 // Limit sells
                 case Keys.Control | Keys.Subtract:
-                    hotkeyOrder(Side.SELL, 1, 0);
+                    hotkeyOrder(Side.SELL, 0);
                     return true;
                 case Keys.Control | Keys.NumPad7:
-                    hotkeyOrder(Side.SELL, 1, +1);
+                    hotkeyOrder(Side.SELL, +1);
                     return true;
                 case Keys.Control | Keys.NumPad8:
-                    hotkeyOrder(Side.SELL, 1, +2);
+                    hotkeyOrder(Side.SELL, +2);
                     return true;
                 case Keys.Control | Keys.NumPad9:
-                    hotkeyOrder(Side.SELL, 1, +3);
+                    hotkeyOrder(Side.SELL, +3);
+                    return true;
+
+                // Change size
+                case Keys.Control | Keys.PageUp:
+                    if (hotkeyLots < 20)
+                    {
+                        hotkeyLots++;
+                        this.updateStatusStrip();
+                    }
+                    return true;
+                case Keys.Control | Keys.PageDown:
+                    if (hotkeyLots > 1)
+                    {
+                        hotkeyLots--;
+                        this.updateStatusStrip();
+                    }
                     return true;
 
                 // Other
@@ -133,9 +151,9 @@ namespace AlphaTrade
             bg.RunWorkerAsync(action);
         }
 
-        private void hotkeyOrder(Side side, int lots, int relPrice)
+        private void hotkeyOrder(Side side, int relPrice)
         {
-            var order = new Order() { Symbol = symbol, Side = side, Size = lotSize * lots, Type = OrderType.LIMIT };
+            var order = new Order() { Symbol = symbol, Side = side, Size = lotSize * hotkeyLots, Type = OrderType.LIMIT };
             order.Unfilled = order.Size;
 
             if (relPrice == 999)
@@ -146,11 +164,11 @@ namespace AlphaTrade
             {
                 if (side == Side.BUY)
                 {
-                    order.Price = bidPrice + relPrice;
+                    order.Price = bidPrice + (relPrice * tickSize);
                 }
                 else
                 {
-                    order.Price = askPrice + relPrice;
+                    order.Price = askPrice + (relPrice * tickSize);
                 }
             }
 
