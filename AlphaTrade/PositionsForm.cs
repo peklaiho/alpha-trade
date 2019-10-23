@@ -43,11 +43,11 @@ namespace AlphaTrade
 
                         if (size > 0)
                         {
-                            row.Cells[3].Value = Util.PNLinUSD(size, price, quote.Ask);
+                            row.Cells[3].Value = Util.PNLinUSD(size, price, quote.Bid);
                         }
                         else
                         {
-                            row.Cells[3].Value = Util.PNLinUSD(size, price, quote.Bid);
+                            row.Cells[3].Value = Util.PNLinUSD(size, price, quote.Ask);
                         }
                     }
                 }
