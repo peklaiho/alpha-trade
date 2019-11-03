@@ -122,14 +122,32 @@ namespace AlphaTrade
 
         private void buttonBuy_Click(object sender, EventArgs e)
         {
-            ((MainForm)this.MdiParent).CreateOrder(makeOrder(Side.BUY));
-            afterEntry();
+            if (confirmOrder())
+            {
+                ((MainForm)this.MdiParent).CreateOrder(makeOrder(Side.BUY));
+                afterEntry();
+            }
         }
 
         private void buttonSell_Click(object sender, EventArgs e)
         {
-            ((MainForm)this.MdiParent).CreateOrder(makeOrder(Side.SELL));
-            afterEntry();
+            if (confirmOrder())
+            {
+                ((MainForm)this.MdiParent).CreateOrder(makeOrder(Side.SELL));
+                afterEntry();
+            }
+        }
+
+        private bool confirmOrder()
+        {
+            OrderType type = (OrderType)this.comboType.SelectedIndex;
+
+            if (type == OrderType.STOP)
+            {
+                return MessageBox.Show("Are you sure you wish to enter a STOP order?", "Confirm order", MessageBoxButtons.YesNo) == DialogResult.Yes;
+            }
+
+            return true;
         }
 
         private Order makeOrder(Side side)

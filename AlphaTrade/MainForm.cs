@@ -116,7 +116,7 @@ namespace AlphaTrade
 
                 // Change size
                 case Keys.Control | Keys.PageUp:
-                    if (hotkeyLots < 20)
+                    if (hotkeyLots < 50)
                     {
                         hotkeyLots++;
                         this.updateStatusStrip();
