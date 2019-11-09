@@ -8,6 +8,7 @@ namespace AlphaTrade
     {
         public static IList<LogEntry> Entries = new List<LogEntry>();
 
+        private static readonly object fileLock = new object();
         private static StreamWriter log;
 
         public static void Init()
@@ -45,11 +46,16 @@ namespace AlphaTrade
         private static void record(LogEntry entry, bool addEntry = true)
         {
             if (addEntry)
+            {
                 Entries.Add(entry);
-
-            string time = entry.Time.ToString("yyyy-MM-dd HH:mm:ss");
-            log.WriteLine(time + " :: " + entry.Level + " :: " + entry.Message);
-            log.Flush();
+            }
+            
+            lock (fileLock)
+            { 
+                string time = entry.Time.ToString("yyyy-MM-dd HH:mm:ss");
+                log.WriteLine(time + " :: " + entry.Level + " :: " + entry.Message);
+                log.Flush();
+            }
         }
     }
 }
