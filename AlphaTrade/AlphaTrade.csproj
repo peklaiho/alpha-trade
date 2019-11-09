@@ -141,6 +141,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Side.cs" />
+    <Compile Include="TradePlanForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TradePlanForm.Designer.cs">
+      <DependentUpon>TradePlanForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="TradesForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -181,6 +187,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="TradePlanForm.resx">
+      <DependentUpon>TradePlanForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TradesForm.resx">
       <DependentUpon>TradesForm.cs</DependentUpon>
     </EmbeddedResource>

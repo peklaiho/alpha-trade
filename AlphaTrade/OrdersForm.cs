@@ -28,8 +28,7 @@ namespace AlphaTrade
                 string sizeStr = order.Size.ToString();
                 if (order.Unfilled < order.Size)
                 {
-                    var filled = order.Size - order.Unfilled;
-                    sizeStr = filled + " / " + order.Size;
+                    sizeStr = order.Unfilled + " / " + order.Size;
                 }
 
                 this.dataGridView1.Rows.Add(

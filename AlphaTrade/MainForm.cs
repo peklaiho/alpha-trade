@@ -259,6 +259,13 @@ namespace AlphaTrade
             form.MdiParent = this;
             form.Show();
         }
+
+        private void notesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = new TradePlanForm();
+            form.MdiParent = this;
+            form.Show();
+        }
         #endregion
 
         #region BackgroundWorkers

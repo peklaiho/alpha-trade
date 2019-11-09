@@ -58,19 +58,9 @@
             0,
             0,
             0});
-            this.numericSize.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             this.numericSize.Name = "numericSize";
             this.numericSize.Size = new System.Drawing.Size(80, 22);
             this.numericSize.TabIndex = 7;
-            this.numericSize.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             // 
             // label2
             // 
